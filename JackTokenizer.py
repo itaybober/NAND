@@ -7,12 +7,12 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
 
-KEYORDS = ['class' , 'constructor' , 'function' , 'method' , 'field' ,
-               'static' , 'var' , 'int' , 'char' , 'boolean' , 'void' , 'true' ,
-               'false' , 'null' , 'this' , 'let' , 'do' , 'if' , 'else' ,
-               'while' , 'return']
-SYMBOLS = ['{' , '}' , '(' , ')' , '[' , ']' , '.' , ',' , ';' , '+' ,
-              '-' , '*' , '/' , '&' , ',' , '<' , '>' , '=' , '~' , '^' , '#']
+KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
+           'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
+           'false', 'null', 'this', 'let', 'do', 'if', 'else',
+           'while', 'return']
+SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
+           '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#']
 INTEGERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
@@ -113,7 +113,6 @@ class JackTokenizer:
         self.cur_index = 0
         self.cur_token = ""
 
-
     def has_more_tokens(self) -> bool:
         """Do we have more tokens in the input?
 
@@ -131,7 +130,6 @@ class JackTokenizer:
             self.cur_token = self.cur_token[self.cur_index]
             self.cur_index += 1
 
-
     def token_type(self) -> str:
         """
         Returns:
@@ -139,7 +137,7 @@ class JackTokenizer:
             "KEYWORD", "SYMBOL", "IDENTIFIER", "INT_CONST", "STRING_CONST"
         """
         if self.cur_token in KEYORDS:
-            return "KEYORD"
+            return "KEYWORD"
         elif self.cur_token in KEYORDS:
             return "SYMBOL"
         elif self.cur_token[0] in INTEGERS:
@@ -158,8 +156,7 @@ class JackTokenizer:
             "BOOLEAN", "CHAR", "VOID", "VAR", "STATIC", "FIELD", "LET", "DO", 
             "IF", "ELSE", "WHILE", "RETURN", "TRUE", "FALSE", "NULL", "THIS"
         """
-        # Your code goes here!
-        pass
+        return self.cur_token.upper()
 
     def symbol(self) -> str:
         """
@@ -170,8 +167,7 @@ class JackTokenizer:
             symbol: '{' | '}' | '(' | ')' | '[' | ']' | '.' | ',' | ';' | '+' | 
               '-' | '*' | '/' | '&' | '|' | '<' | '>' | '=' | '~' | '^' | '#'
         """
-        # Your code goes here!
-        pass
+        return str(self.cur_token)
 
     def identifier(self) -> str:
         """

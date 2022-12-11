@@ -113,14 +113,17 @@ class JackTokenizer:
         in_comment = False
         # rids all of the commented lines
         for i in range(len(self.input_lines)):
-            double_back = ()
-
-
-            index = min([self.input_lines[i].find("//"), self.input_lines[i].find("/*"), self.input_lines[i].find("/**")])
-            if index != -1:
-                self.input_lines[i] = self.input_lines[:index]
-
-
+            cur_line = self.input_lines[i]
+            self.input_lines[i] = ""
+            for j in range(len(cur_line)):
+                if not in_comment and cur_line[j] == '/' and cur_line[j+1] == "/":
+                    break
+                if not in_comment and cur_line[j] == "/" and cur_line[j+1] == "*":
+                    in_comment = True
+                if not in_comment:
+                    self.input_lines[i] += cur_line[j]
+                if cur_line[j] == "/" and cur_line[j-1] == "*":
+                    in_comment = False
 
         self.input_tokens = []
         for line in self.input_lines:

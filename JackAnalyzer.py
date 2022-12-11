@@ -22,8 +22,9 @@ def analyze_file(
     """
     # Your code goes here!
     # It might be good to start by creating a new JackTokenizer and CompilationEngine:
-    # tokenizer = JackTokenizer(input_file)
-    # engine = CompilationEngine(tokenizer, output_file)
+    tokenizer = JackTokenizer(input_file)
+    engine = CompilationEngine(tokenizer, output_file)
+    print("finished")
     pass
 
 
@@ -33,6 +34,8 @@ if "__main__" == __name__:
     # Both are closed automatically when the code finishes running.
     # If the output file does not exist, it is created automatically in the
     # correct path, using the correct filename.
+
+
     if not len(sys.argv) == 2:
         sys.exit("Invalid usage, please use: JackAnalyzer <input path>")
     argument_path = os.path.abspath(sys.argv[1])

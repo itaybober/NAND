@@ -118,7 +118,6 @@ class JackTokenizer:
 
             index = min([self.input_lines[i].find("//"), self.input_lines[i].find("/*"), self.input_lines[i].find("/**")])
             if index != -1:
-
                 self.input_lines[i] = self.input_lines[:index]
 
 
@@ -128,10 +127,6 @@ class JackTokenizer:
             if len(line) == 0:
                 continue
             self.input_tokens += line.split()
-        self.cur_index = 0
-        pass
-        self.input_tokens = []
-        self.input_lines = input_stream.read().splitlines()
         self.cur_index = 0
         self.cur_token = ""
 

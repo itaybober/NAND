@@ -7,6 +7,14 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
 
+KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
+           'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
+           'false', 'null', 'this', 'let', 'do', 'if', 'else',
+           'while', 'return']
+SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
+           '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#']
+INTEGERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 
 class JackTokenizer:
     """Removes all comments from the input stream and breaks it
@@ -122,6 +130,10 @@ class JackTokenizer:
             self.input_tokens += line.split()
         self.cur_index = 0
         pass
+        self.input_tokens = []
+        self.input_lines = input_stream.read().splitlines()
+        self.cur_index = 0
+        self.cur_token = ""
 
     def has_more_tokens(self) -> bool:
         """Do we have more tokens in the input?
@@ -129,16 +141,16 @@ class JackTokenizer:
         Returns:
             bool: True if there are more tokens, False otherwise.
         """
-        # Your code goes here!
-        pass
+        return self.cur_index <= len(self.input_tokens) - 1
 
     def advance(self) -> None:
         """Gets the next token from the input and makes it the current token. 
         This method should be called if has_more_tokens() is true. 
         Initially there is no current token.
         """
-        # Your code goes here!
-        pass
+        if self.has_more_tokens():
+            self.cur_token = self.cur_token[self.cur_index]
+            self.cur_index += 1
 
     def token_type(self) -> str:
         """
@@ -146,8 +158,16 @@ class JackTokenizer:
             str: the type of the current token, can be
             "KEYWORD", "SYMBOL", "IDENTIFIER", "INT_CONST", "STRING_CONST"
         """
-        # Your code goes here!
-        pass
+        if self.cur_token in KEYORDS:
+            return "KEYWORD"
+        elif self.cur_token in KEYORDS:
+            return "SYMBOL"
+        elif self.cur_token[0] in INTEGERS:
+            return "INT_CONST"
+        elif self.cur_token[0] in ['\"', '\'']:
+            return "STRING_CONST"
+        else:
+            return "IDENTIFIER"
 
     def keyword(self) -> str:
         """
@@ -158,8 +178,7 @@ class JackTokenizer:
             "BOOLEAN", "CHAR", "VOID", "VAR", "STATIC", "FIELD", "LET", "DO", 
             "IF", "ELSE", "WHILE", "RETURN", "TRUE", "FALSE", "NULL", "THIS"
         """
-        # Your code goes here!
-        pass
+        return self.cur_token.upper()
 
     def symbol(self) -> str:
         """
@@ -170,8 +189,7 @@ class JackTokenizer:
             symbol: '{' | '}' | '(' | ')' | '[' | ']' | '.' | ',' | ';' | '+' | 
               '-' | '*' | '/' | '&' | '|' | '<' | '>' | '=' | '~' | '^' | '#'
         """
-        # Your code goes here!
-        pass
+        return str(self.cur_token)
 
     def identifier(self) -> str:
         """

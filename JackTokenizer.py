@@ -100,7 +100,27 @@ class JackTokenizer:
         """
         # Your code goes here!
         # A good place to start is to read all the lines of the input:
-        # input_lines = input_stream.read().splitlines()
+        self.input_lines = input_stream.read().splitlines()
+        self.clean_lines = []
+        in_comment = False
+        # rids all of the commented lines
+        for i in range(len(self.input_lines)):
+            double_back = ()
+
+
+            index = min([self.input_lines[i].find("//"), self.input_lines[i].find("/*"), self.input_lines[i].find("/**")])
+            if index != -1:
+
+                self.input_lines[i] = self.input_lines[:index]
+
+
+
+        self.input_tokens = []
+        for line in self.input_lines:
+            if len(line) == 0:
+                continue
+            self.input_tokens += line.split()
+        self.cur_index = 0
         pass
 
     def has_more_tokens(self) -> bool:

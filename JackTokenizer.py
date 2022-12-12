@@ -7,6 +7,7 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
 
+ABC = "abcdefghijklmnopqrstuvwxyz"
 KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
            'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
            'false', 'null', 'this', 'let', 'do', 'if', 'else',
@@ -109,7 +110,7 @@ class JackTokenizer:
         # Your code goes here!
         # A good place to start is to read all the lines of the input:
         self.input_lines = input_stream.read().splitlines()
-        self.clean_lines = []
+        self.clean_lines = self.clean_token_list()
         in_comment = False
         # rids all of the commented lines
         for i in range(len(self.input_lines)):
@@ -132,6 +133,46 @@ class JackTokenizer:
             self.input_tokens += line.split()
         self.cur_index = 0
         self.cur_token = ""
+
+    def clean_token_list(self):
+        raw = self.input_lines
+        clean = []
+        word = ""
+        number = ""
+
+        for phrase in raw:
+            if word != "":
+                clean.append(word)
+                word = ""
+            if number != "":
+                clean.append(number)
+                number = ""
+
+            for letter in phrase:
+
+                if letter in SYMBOLS:
+                    if word != "":
+                        clean.append(word)
+                        word = ""
+                    if number != "":
+                        clean.append(number)
+                        number = ""
+                    clean.append(letter)
+
+                elif letter in ABC:
+                    word += letter
+                    if number != "":
+                        clean.append(number)
+                        number = ""
+
+                elif letter in INTEGERS:
+                    number += letter
+                    if word != "":
+                        clean.append(word)
+                        word = ""
+
+        return clean
+
 
     def has_more_tokens(self) -> bool:
         """Do we have more tokens in the input?

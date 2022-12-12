@@ -7,7 +7,7 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
 
-ABC = "abcdefghijklmnopqrstuvwxyz"
+ABC = "abcdefghijklmnopqrstuvwxyz_"
 KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
            'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
            'false', 'null', 'this', 'let', 'do', 'if', 'else',
@@ -240,8 +240,7 @@ class JackTokenizer:
                   starting with a digit. You can assume keywords cannot be
                   identifiers, so 'self' cannot be an identifier, etc'.
         """
-        # Your code goes here!
-        pass
+        return self.cur_token
 
     def int_val(self) -> int:
         """
@@ -251,8 +250,7 @@ class JackTokenizer:
             Recall that integerConstant was defined in the grammar like so:
             integerConstant: A decimal number in the range 0-32767.
         """
-        # Your code goes here!
-        pass
+        return int(self.cur_token)
 
     def string_val(self) -> str:
         """
@@ -263,5 +261,4 @@ class JackTokenizer:
             StringConstant: '"' A sequence of Unicode characters not including 
                       double quote or newline '"'
         """
-        # Your code goes here!
-        pass
+

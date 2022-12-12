@@ -166,10 +166,10 @@ class JackTokenizer:
                         number = ""
 
                 elif letter in INTEGERS:
-                    number += letter
-                    if word != "":
-                        clean.append(word)
-                        word = ""
+                    if word == "":
+                        number += letter
+                    else:
+                        word += letter
 
         return clean
 

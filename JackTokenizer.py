@@ -110,7 +110,6 @@ class JackTokenizer:
         # Your code goes here!
         # A good place to start is to read all the lines of the input:
         self.input_lines = input_stream.read().splitlines()
-        self.clean_lines = self.clean_token_list()
         in_comment = False
         # rids all of the commented lines
         for i in range(len(self.input_lines)):
@@ -131,11 +130,13 @@ class JackTokenizer:
             if len(line) == 0:
                 continue
             self.input_tokens += line.split()
+
+        self.clean_token = self.clean_token_list()
         self.cur_index = 0
         self.cur_token = ""
 
     def clean_token_list(self):
-        raw = self.input_lines
+        raw = self.input_tokens
         clean = []
         word = ""
         number = ""

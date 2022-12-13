@@ -20,7 +20,7 @@ class Main {
 			let a[i] = Keyboard.readInt("ENTER THE NEXT NUMBER: ");
 			let i = i + 1;
 		}
-		
+
 		let i = 0;
 		let sum = 0;
 		

@@ -5,7 +5,10 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
+
 import typing
+
+import JackTokenizer
 
 
 class CompilationEngine:
@@ -35,7 +38,6 @@ class CompilationEngine:
         self.output.write("<identifier> " + self.tokenizer.cur_token + " </identifier>")
         self.tokenizer.advance()
         self.output.write("<token>")
-
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
@@ -85,15 +87,13 @@ class CompilationEngine:
         output = "<whileStatment>\n" \
                  "<keyword>" + self.tokenizer.cur_token + "</keyword>\n"
         self.tokenizer.advance()
-        output +=  "<symbol>" + self.cur_token + "</symbol>"
+        output += "<symbol>" + self.cur_token + "</symbol>"
         self.tokenizer.advance()
         self.output.write(output)
         self.compile_expression()
 
-
         self.output.write("<keyword>")
         self.output.write("<symbolsymbolsymbol>")
-
 
     def compile_return(self) -> None:
         """Compiles a return statement."""
@@ -108,9 +108,8 @@ class CompilationEngine:
     def compile_expression(self) -> None:
         """Compiles an expression."""
         # Your code goes here!
-        self.output.write( "<expression>")
+        self.output.write("<expression>")
         self.compile_term()
-
 
     def compile_term(self) -> None:
         """Compiles a term. 
@@ -127,10 +126,15 @@ class CompilationEngine:
         cur_token = self.tokenizer.cur_token
         if self.tokenizer.token_type == "IDENTIFIER":
             self.tokenizer.advance()
-            if self.tokenizer.token_type in ["[","(","."]:
-
+            # if self.tokenizer.token_type in ["[","(","."]:
 
     def compile_expression_list(self) -> None:
         """Compiles a (possibly empty) comma-separated list of expressions."""
         # Your code goes here!
         pass
+
+    def eat(self, string):
+        if self.tokenizer.cur_token != string:
+            raise Exception("Expected different string")
+        else:
+            self.tokenizer.advance()

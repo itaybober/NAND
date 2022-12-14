@@ -156,6 +156,7 @@ class JackTokenizer:
                         word += letter
                         clean.append(word)
                         word = ""
+                        continue
 
                 elif string_var:
                     word += letter
@@ -213,8 +214,8 @@ class JackTokenizer:
         Initially there is no current token.
         """
         if self.has_more_tokens():
-            self.cur_token = self.cur_token[self.cur_index]
             self.cur_index += 1
+            self.cur_token = self.clean_token[self.cur_index]
 
     def token_type(self) -> str:
         """

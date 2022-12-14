@@ -14,7 +14,7 @@ KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
            'while', 'return']
 SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
            '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#']
-INTEGERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+INTEGERS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 
 class JackTokenizer:
@@ -133,7 +133,7 @@ class JackTokenizer:
 
         self.clean_token = self.clean_token_list()
         self.cur_index = 0
-        self.cur_token = ""
+        self.cur_token = self.clean_token[0]
 
     def clean_token_list(self):
         raw = self.input_lines
@@ -156,6 +156,7 @@ class JackTokenizer:
                         word += letter
                         clean.append(word)
                         word = ""
+                        continue
 
                 elif string_var:
                     word += letter
@@ -205,7 +206,7 @@ class JackTokenizer:
         Returns:
             bool: True if there are more tokens, False otherwise.
         """
-        return self.cur_index <= len(self.input_tokens) - 1
+        return self.cur_index < len(self.clean_token) - 1
 
     def advance(self) -> None:
         """Gets the next token from the input and makes it the current token. 
@@ -213,8 +214,9 @@ class JackTokenizer:
         Initially there is no current token.
         """
         if self.has_more_tokens():
-            self.cur_token = self.cur_token[self.cur_index]
             self.cur_index += 1
+            self.cur_token = self.clean_token[self.cur_index]
+
 
     def token_type(self) -> str:
         """
@@ -224,7 +226,7 @@ class JackTokenizer:
         """
         if self.cur_token in KEYORDS:
             return "KEYWORD"
-        elif self.cur_token in KEYORDS:
+        elif self.cur_token in SYMBOLS:
             return "SYMBOL"
         elif self.cur_token[0] in INTEGERS:
             return "INT_CONST"
@@ -255,7 +257,15 @@ class JackTokenizer:
             symbol: '{' | '}' | '(' | ')' | '[' | ']' | '.' | ',' | ';' | '+' | 
               '-' | '*' | '/' | '&' | '|' | '<' | '>' | '=' | '~' | '^' | '#'
         """
-        return str(self.cur_token)
+        if self.cur_token == '&':
+            return "&amp"
+        if self.cur_token == '"':
+            return "&quot"
+        if self.cur_token == '>':
+            return "&gt"
+        if self.cur_token == '<':
+            return "&lt"
+        return self.cur_token
 
 
     def identifier(self) -> str:
@@ -291,5 +301,5 @@ class JackTokenizer:
             StringConstant: '"' A sequence of Unicode characters not including 
                       double quote or newline '"'
         """
-        "token"
 
+        return self.cur_token

@@ -78,20 +78,19 @@ class CompilationEngine:
 
     def compile_do(self) -> None:
         """Compiles a do statement."""
-        # Your code goes here!
-        pass
+        self.output.write("<doStatement>\n")
+        self.eat("do")
+        self.compile_subroutine()
 
     def compile_let(self) -> None:
         """Compiles a let statement."""
 
+        self.output.write("<letStatement>\n")
         self.eat("let")
-        self.output.write("<letStatement>\n<keyword>" + self.tokenizer.cur_token + "</keyword>\n")
-        self.output.write("<identifier>" + self.tokenizer.cur_token + "</identifier>\n")
+        self.write_out()
         self.eat("=")
-        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
         self.compile_expression()
         self.eat(";")
-        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
         self.output.write("</letStatement>\n")
 
 
@@ -99,24 +98,14 @@ class CompilationEngine:
     def compile_while(self) -> None:
         """Compiles a while statement."""
 
-        self.eat("while")
-        output = "<whileStatement>\n" \
-                 "<keyword>" + self.tokenizer.cur_token + "</keyword>\n"
+        self.output.write("<whileStatement>\n")
+        self.eat('while')
         self.eat("(")
-        output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
-        self.output.write(output)
-        output = ""
         self.compile_expression()
         self.eat(")")
-        output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
         self.eat("{")
-        output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
-        self.output.write(output)
-        output = ""
         self.compile_statements()
         self.eat("}")
-        output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
-        self.output.write(output)
         self.output.write("</whileStatement>\n")
 
     def compile_return(self) -> None:
@@ -126,18 +115,14 @@ class CompilationEngine:
 
     def compile_if(self) -> None:
         """Compiles a if statement, possibly with a trailing else clause."""
+        self.output.write("<ifStatement>\n")
         self.eat("if")
-        self.output.write("<ifStatement>\n<keyword>if</keyword>\n")
         self.eat("(")
-        self.output.write("<symbol>(</symbol>\n")
         self.compile_expression()
         self.eat(")")
-        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
         self.eat("{")
-        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
         self.compile_statements()
         self.eat("}")
-        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
         self.output.write("</ifStatement>\n")
 
 

@@ -201,6 +201,7 @@ class CompilationEngine:
 
 #TODO Class compile
 #TODO subrutine
+#TODO subrutine dec
 #TODO param list
 #TODO subrutine body
 #TODO var dec
@@ -208,5 +209,6 @@ class CompilationEngine:
 #TODO expration
 #TODO expration list
 #TODO tudubom
-#TODO
+#TODO do statement
+#TODO return
 #TODO

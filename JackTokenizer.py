@@ -7,7 +7,7 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
 
-ABC = "abcdefghijklmnopqrstuvwxyz_"
+ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"
 KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
            'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
            'false', 'null', 'this', 'let', 'do', 'if', 'else',
@@ -143,8 +143,11 @@ class JackTokenizer:
 
         for phrase in raw:
             if word != "":
-                clean.append(word)
-                word = ""
+                if word in KEYORDS:
+                    clean.append(word)
+                    word = ""
+                else:
+                    word += " "
             if number != "":
                 clean.append(number)
                 number = ""
@@ -209,6 +212,7 @@ class JackTokenizer:
         else:
             return "IDENTIFIER"
 
+
     def keyword(self) -> str:
         """
         Returns:
@@ -220,6 +224,7 @@ class JackTokenizer:
         """
         return self.cur_token.upper()
 
+
     def symbol(self) -> str:
         """
         Returns:
@@ -230,6 +235,7 @@ class JackTokenizer:
               '-' | '*' | '/' | '&' | '|' | '<' | '>' | '=' | '~' | '^' | '#'
         """
         return str(self.cur_token)
+
 
     def identifier(self) -> str:
         """
@@ -243,6 +249,7 @@ class JackTokenizer:
         """
         return self.cur_token
 
+
     def int_val(self) -> int:
         """
         Returns:
@@ -253,6 +260,7 @@ class JackTokenizer:
         """
         return int(self.cur_token)
 
+
     def string_val(self) -> str:
         """
         Returns:
@@ -262,4 +270,5 @@ class JackTokenizer:
             StringConstant: '"' A sequence of Unicode characters not including 
                       double quote or newline '"'
         """
+        "token"
 

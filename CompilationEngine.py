@@ -80,20 +80,24 @@ class CompilationEngine:
     def compile_let(self) -> None:
         """Compiles a let statement."""
         # Your code goes here!
-        pass
+        self.eat("let")
 
     def compile_while(self) -> None:
         """Compiles a while statement."""
-        output = "<whileStatment>\n" \
-                 "<keyword>" + self.tokenizer.cur_token + "</keyword>\n"
-        self.tokenizer.advance()
-        output += "<symbol>" + self.cur_token + "</symbol>"
-        self.tokenizer.advance()
-        self.output.write(output)
-        self.compile_expression()
 
-        self.output.write("<keyword>")
-        self.output.write("<symbolsymbolsymbol>")
+        self.eat("while")
+        output = "<whileStatment>\n\t" \
+                 "<keyword>" + str(self.tokenizer.cur_token) + "</keyword>\n"
+        self.eat("(")
+        output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
+        self.compile_expression()
+        self.eat(")")
+        output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
+        self.eat("{")
+        output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
+        self.compile_statements()
+        self.eat("}")
+        output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
 
     def compile_return(self) -> None:
         """Compiles a return statement."""

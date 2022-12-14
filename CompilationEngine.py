@@ -80,7 +80,19 @@ class CompilationEngine:
         """Compiles a do statement."""
         self.output.write("<doStatement>\n")
         self.eat("do")
-        self.compile_subroutine()
+        self.write_out()
+        if self.tokenizer.cur_token == ".":
+            self.eat(".")
+            self.write_out()
+            self.eat("(")
+            self.compile_expression_list()
+            self.eat(")")
+        else:
+            self.write_out()
+            self.output.write("</doStatement>\n")
+
+
+
 
     def compile_let(self) -> None:
         """Compiles a let statement."""
@@ -169,7 +181,12 @@ class CompilationEngine:
 
     def compile_expression_list(self) -> None:
         """Compiles a (possibly empty) comma-separated list of expressions."""
-        # Your code goes here!
+        self.output.write("<expressionList>\n")
+        while self.tokenizer.cur_token != ")":
+            self.compile_expression()
+            if self.tokenizer.cur_token == ",":
+                self.eat(",")
+        self.output.write("</expressionList>\n")
 
 
     def eat(self, string):
@@ -177,7 +194,6 @@ class CompilationEngine:
             raise Exception("Expected different string")
         else:
             self.write_out()
-            self.tokenizer.advance()
 
     def write_out(self):
         type = self.tokenizer.token_type()
@@ -185,17 +201,9 @@ class CompilationEngine:
         self.tokenizer.advance()
 
 
-
-#TODO Class compile
 #TODO subrutine
-#TODO subrutine dec
 #TODO param list
-#TODO subrutine body
 #TODO var dec
 #TODO statements
 #TODO expration
 #TODO expration list
-#TODO tudubom
-#TODO do statement
-#TODO return
-#TODO

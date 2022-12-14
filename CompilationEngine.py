@@ -1,4 +1,4 @@
-5"""
+"""
 This file is part of nand2tetris, as taught in The Hebrew University, and
 was written by Aviv Yaish. It is an extension to the specifications given
 [here](https://www.nand2tetris.org) (Shimon Schocken and Noam Nisan, 2017),
@@ -23,12 +23,19 @@ class CompilationEngine:
         # Your code goes here!
         # Note that you can write to output_stream like so:
         # output_stream.write("Hello world! \n")
-        pass
+        self.tokenizer = input_stream
+        self.output = output_stream
+        self.output.write("<tokens>")
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
         # Your code goes here!
-        pass
+
+        self.output.write("<token>")
+        self.output.write("<identifier> " + self.tokenizer.cur_token + " </identifier>")
+        self.tokenizer.advance()
+        self.output.write("<token>")
+
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
@@ -75,8 +82,18 @@ class CompilationEngine:
 
     def compile_while(self) -> None:
         """Compiles a while statement."""
-        # Your code goes here!
-        pass
+        output = "<whileStatment>\n" \
+                 "<keyword>" + self.tokenizer.cur_token + "</keyword>\n"
+        self.tokenizer.advance()
+        output +=  "<symbol>" + self.cur_token + "</symbol>"
+        self.tokenizer.advance()
+        self.output.write(output)
+        self.compile_expression()
+
+
+        self.output.write("<keyword>")
+        self.output.write("<symbolsymbolsymbol>")
+
 
     def compile_return(self) -> None:
         """Compiles a return statement."""
@@ -91,7 +108,9 @@ class CompilationEngine:
     def compile_expression(self) -> None:
         """Compiles an expression."""
         # Your code goes here!
-        pass
+        self.output.write( "<expression>")
+        self.compile_term()
+
 
     def compile_term(self) -> None:
         """Compiles a term. 
@@ -104,7 +123,12 @@ class CompilationEngine:
         part of this term and should not be advanced over.
         """
         # Your code goes here!
-        pass
+        output = "<term>\n"
+        cur_token = self.tokenizer.cur_token
+        if self.tokenizer.token_type == "IDENTIFIER":
+            self.tokenizer.advance()
+            if self.tokenizer.token_type in ["[","(","."]:
+
 
     def compile_expression_list(self) -> None:
         """Compiles a (possibly empty) comma-separated list of expressions."""

@@ -163,28 +163,29 @@ class CompilationEngine:
         # Your code goes here!
         self.output.write("<term>\n")
         prev_token = self.tokenizer.cur_token
-        if self.tokenizer.token_type == "IDENTIFIER":
-            self.tokenizer.advance()
+        self.write_out()
+        if prev_token == "IDENTIFIER":
             if self.tokenizer.cur_token == ".":
-
                 self.eat(".")
                 self.compile_subroutine()
             elif self.tokenizer.cur_token == "(":
                 self.eat("(")
                 # TODO this is definetly wrong
-                self.compile_expression_list()
+                self.compile_expression()
                 self.eat(")")
             elif self.tokenizer.cur_token == "[":
                 self.eat("[")
                 self.compile_expression()
                 self.eat("]")
-        elif
+            elif self.tokenizer.cur_token in ['-','~']:
+                self.write_out()
+        self.output.write("</term>\n")
 
 
     def compile_expression_list(self) -> None:
         """Compiles a (possibly empty) comma-separated list of expressions."""
         # Your code goes here!
-        pass
+
 
     def eat(self, string):
         if self.tokenizer.cur_token != string:
@@ -194,8 +195,9 @@ class CompilationEngine:
             self.tokenizer.advance()
 
     def write_out(self):
-        type = self.tokenizer.token_type
-        self.output.write("<" + self.dict[type] + ">" + self.tokenizer.cur_token +"</" + self.dict[type] + ">" )
+        type = self.tokenizer.token_type()
+        self.output.write("<" + self.dict[type] + ">" + self.tokenizer.cur_token +"</" + self.dict[type] + ">\n")
+        self.tokenizer.advance()
 
 
 

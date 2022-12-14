@@ -32,26 +32,33 @@ class CompilationEngine:
         # output_stream.write("Hello world! \n")
         self.tokenizer = input_stream
         self.output = output_stream
-        self.output.write("<tokens>")
+        self.output.write("<tokens>\n")
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
-        self.output.write("<class>")
+        self.output.write("<class>\n")
         self.eat("class")
         self.write_out()
         self.eat("{")
-        # TODO this could cause endless loop
         while self.tokenizer.cur_token in ["static", "field"]:
             self.compile_class_var_dec()
         while self.tokenizer.cur_token in ["constructor", "function", "method"]:
             self.compile_subroutine()
         self.eat("}")
-        self.output.write("</class>")
+        self.output.write("</class>\n")
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
-        # Your code goes here!
-        pass
+        self.output.write("<varDec>\n")
+        self.eat("var")
+        # TODO do i need to parse which type it is specifically
+        self.write_out()
+        self.write_out()
+        while self.tokenizer.cur_token != ";":
+            self.eat(",")
+            self.write_out()
+        self.eat(";")
+        self.output.write("</varDec>\n")
 
     def compile_subroutine(self) -> None:
         """

@@ -127,9 +127,9 @@ class CompilationEngine:
     def compile_if(self) -> None:
         """Compiles a if statement, possibly with a trailing else clause."""
         self.eat("if")
-        self.output.write("<ifStatement>\n<keyword>" + self.tokenizer.cur_token + "</keyword>\n")
+        self.output.write("<ifStatement>\n<keyword>if</keyword>\n")
         self.eat("(")
-        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
+        self.output.write("<symbol>(</symbol>\n")
         self.compile_expression()
         self.eat(")")
         self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
@@ -145,8 +145,10 @@ class CompilationEngine:
     def compile_expression(self) -> None:
         """Compiles an expression."""
         # Your code goes here!
-        self.output.write("<expression>")
+        self.output.write("<expression>\n")
         self.compile_term()
+        self.output.write()
+        self.output.write("</expression>\n")
 
     def compile_term(self) -> None:
         """Compiles a term. 
@@ -194,3 +196,17 @@ class CompilationEngine:
     def write_out(self):
         type = self.tokenizer.token_type
         self.output.write("<" + self.dict[type] + ">" + self.tokenizer.cur_token +"</" + self.dict[type] + ">" )
+
+
+
+#TODO Class compile
+#TODO subrutine
+#TODO param list
+#TODO subrutine body
+#TODO var dec
+#TODO statements
+#TODO expration
+#TODO expration list
+#TODO tudubom
+#TODO
+#TODO

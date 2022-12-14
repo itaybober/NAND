@@ -41,17 +41,12 @@ class CompilationEngine:
         self.write_out()
         self.eat("{")
         # TODO this could cause endless loop
-        while(self.tokenizer.cur_token in ["static", "field"]):
+        while self.tokenizer.cur_token in ["static", "field"]:
             self.compile_class_var_dec()
-        while (self.tokenizer.cur_token in ["constructor", "function", "method"]):
+        while self.tokenizer.cur_token in ["constructor", "function", "method"]:
             self.compile_subroutine()
         self.eat("}")
         self.output.write("</class>")
-
-        self.output.write("<token>")
-        self.output.write("<identifier> " + self.tokenizer.cur_token + " </identifier>")
-        self.tokenizer.advance()
-        self.output.write("<token>")
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
@@ -83,8 +78,20 @@ class CompilationEngine:
         """Compiles a sequence of statements, not including the enclosing 
         "{}".
         """
-        # Your code goes here!
-        pass
+        self.output.write("<statements>\n")
+        while self.tokenizer.cur_token in ["if", "while", "let", "do", "return"]:
+            if self.tokenizer.cur_token == "if":
+                self.compile_if()
+            elif self.tokenizer.cur_token == "let":
+                self.compile_if()
+            elif self.tokenizer.cur_token == "while":
+                self.compile_while()
+            elif self.tokenizer.cur_token == "do":
+                self.compile_do()
+            elif self.tokenizer.cur_token == "return":
+                self.compile_return()
+        self.output.write("</statements>\n")
+
 
     def compile_do(self) -> None:
         """Compiles a do statement."""
@@ -134,7 +141,7 @@ class CompilationEngine:
         """Compiles a return statement."""
         self.output.write("<returnStatement>\n")
         self.eat("return")
-        if (self.tokenizer.cur_token != ";"):
+        if self.tokenizer.cur_token != ";":
             self.compile_expression()
         self.eat(";")
         self.output.write("<returnStatement>\n")
@@ -218,8 +225,5 @@ class CompilationEngine:
 
 #TODO subrutine
 #TODO param list
-#TODO var dec
-#TODO statements
 #TODO expration
-#TODO expration list
 

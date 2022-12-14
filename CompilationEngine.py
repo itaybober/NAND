@@ -36,12 +36,18 @@ class CompilationEngine:
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
-        # Your code goes here!
+        self.output.write("<class>")
+        self.eat("class")
+        self.write_out()
+        self.eat("{")
+        # TODO this could cause endless loop
+        while(self.tokenizer.cur_token in ["static", "field"]):
+            self.compile_class_var_dec()
+        while (self.tokenizer.cur_token in ["constructor", "function", "method"]):
+            self.compile_subroutine()
+        self.eat("}")
+        self.output.write("</class>")
 
-        self.output.write("<token>")
-        self.output.write("<identifier> " + self.tokenizer.cur_token + " </identifier>")
-        self.tokenizer.advance()
-        self.output.write("<token>")
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
@@ -121,8 +127,12 @@ class CompilationEngine:
 
     def compile_return(self) -> None:
         """Compiles a return statement."""
-        # Your code goes here!
-        pass
+        self.output.write("<returnStatement>\n")
+        self.eat("return")
+        if (self.tokenizer.cur_token != ";"):
+            self.compile_expression()
+        self.eat(";")
+        self.output.write("<returnStatement>\n")
 
     def compile_if(self) -> None:
         """Compiles a if statement, possibly with a trailing else clause."""
@@ -144,11 +154,7 @@ class CompilationEngine:
 
     def compile_expression(self) -> None:
         """Compiles an expression."""
-        # Your code goes here!
-        self.output.write("<expression>\n")
-        self.compile_term()
-        self.output.write()
-        self.output.write("</expression>\n")
+
 
     def compile_term(self) -> None:
         """Compiles a term. 
@@ -201,16 +207,10 @@ class CompilationEngine:
 
 
 
-#TODO Class compile
 #TODO subrutine
-#TODO subrutine dec
 #TODO param list
-#TODO subrutine body
 #TODO var dec
 #TODO statements
 #TODO expration
 #TODO expration list
-#TODO tudubom
-#TODO do statement
-#TODO return
-#TODO
+

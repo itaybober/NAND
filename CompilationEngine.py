@@ -172,7 +172,9 @@ class CompilationEngine:
         # Your code goes here!
         self.output.write("<expression>\n")
         self.compile_term()
-        self.output.write()
+        if self.tokenizer.cur_token in ['+','-','*',"/", "&", "|", "<", ">", "="]:
+            self.write_out()
+            self.compile_term()
         self.output.write("</expression>\n")
 
     def compile_term(self) -> None:
@@ -232,5 +234,5 @@ class CompilationEngine:
 
 #TODO subrutine
 #TODO param list
-#TODO expration
+
 

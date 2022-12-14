@@ -24,6 +24,10 @@ def analyze_file(
     # It might be good to start by creating a new JackTokenizer and CompilationEngine:
     tokenizer = JackTokenizer(input_file)
     engine = CompilationEngine(tokenizer, output_file)
+    while (tokenizer.has_more_tokens()):
+        output_file.write("<" + tokenizer.token_type().lower() +"> " + tokenizer.cur_token + " </" +tokenizer.token_type().lower() + ">\n")
+        tokenizer.advance()
+
     print("finished")
     pass
 

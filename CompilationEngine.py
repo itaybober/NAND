@@ -5,16 +5,20 @@ was written by Aviv Yaish. It is an extension to the specifications given
 as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
-
 import typing
 
 import JackTokenizer
+
+
 
 
 class CompilationEngine:
     """Gets input from a JackTokenizer and emits its parsed structure into an
     output stream.
     """
+    dict = {"KEYWORD": "keywords", "SYMBOL": "symbol", "INT_CONST": "integerConstant",
+                  "STRING_CONST":"stringConstant", "IDENTIFIER":"identifier"}
+
 
     def __init__(self, input_stream: "JackTokenizer", output_stream) -> None:
         """
@@ -126,11 +130,25 @@ class CompilationEngine:
         part of this term and should not be advanced over.
         """
         # Your code goes here!
-        output = "<term>\n"
-        cur_token = self.tokenizer.cur_token
+        self.output.write("<term>\n")
+        prev_token = self.tokenizer.cur_token
         if self.tokenizer.token_type == "IDENTIFIER":
             self.tokenizer.advance()
-            # if self.tokenizer.token_type in ["[","(","."]:
+            if self.tokenizer.cur_token == ".":
+
+                self.eat(".")
+                self.compile_subroutine()
+            elif self.tokenizer.cur_token == "(":
+                self.eat("(")
+                # TODO this is definetly wrong
+                self.compile_expression_list()
+                self.eat(")")
+            elif self.tokenizer.cur_token == "[":
+                self.eat("[")
+                self.compile_expression()
+                self.eat("]")
+        elif
+
 
     def compile_expression_list(self) -> None:
         """Compiles a (possibly empty) comma-separated list of expressions."""
@@ -141,4 +159,9 @@ class CompilationEngine:
         if self.tokenizer.cur_token != string:
             raise Exception("Expected different string")
         else:
+            self.write_out()
             self.tokenizer.advance()
+
+    def write_out(self):
+        type = self.tokenizer.token_type
+        self.output.write("<" + self.dict[type] + ">" + self.tokenizer.cur_token +"</" + self.dict[type] + ">" )

@@ -7,7 +7,7 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
 
-ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"
+ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_?:"
 KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
            'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
            'false', 'null', 'this', 'let', 'do', 'if', 'else',
@@ -136,25 +136,45 @@ class JackTokenizer:
         self.cur_token = ""
 
     def clean_token_list(self):
-        raw = self.input_tokens
+        raw = self.input_lines
         clean = []
         word = ""
         number = ""
+        string_var = False
 
         for phrase in raw:
-            if word != "":
-                if word in KEYORDS:
-                    clean.append(word)
-                    word = ""
-                else:
-                    word += " "
-            if number != "":
-                clean.append(number)
-                number = ""
 
             for letter in phrase:
 
+                if letter == "\"" or letter == "\'":
+                    if not string_var:
+                        string_var = True
+                        word += letter
+                        continue
+                    else:
+                        string_var = False
+                        word += letter
+                        clean.append(word)
+                        word = ""
+
+                elif string_var:
+                    word += letter
+                    continue
+
+
+                if word != "":
+                    if letter == " ":
+                        clean.append(word)
+                        word = ""
+
+
+                elif number != "":
+                    if letter == " ":
+                        clean.append(number)
+                        number = ""
+
                 if letter in SYMBOLS:
+
                     if word != "":
                         clean.append(word)
                         word = ""
@@ -163,17 +183,18 @@ class JackTokenizer:
                         number = ""
                     clean.append(letter)
 
-                elif letter in ABC:
-                    word += letter
-                    if number != "":
-                        clean.append(number)
-                        number = ""
-
                 elif letter in INTEGERS:
                     if word == "":
                         number += letter
                     else:
                         word += letter
+
+
+                elif letter != " " and letter != "\t":
+                    word += letter
+                    if number != "":
+                        clean.append(number)
+                        number = ""
 
         return clean
 

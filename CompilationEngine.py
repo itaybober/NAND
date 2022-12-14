@@ -83,25 +83,41 @@ class CompilationEngine:
 
     def compile_let(self) -> None:
         """Compiles a let statement."""
-        # Your code goes here!
+
         self.eat("let")
+        self.output.write("<letStatement>\n<keyword>" + self.tokenizer.cur_token + "</keyword>\n")
+        self.output.write("<identifier>" + self.tokenizer.cur_token + "</identifier>\n")
+        self.eat("=")
+        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
+        self.compile_expression()
+        self.eat(";")
+        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
+        self.output.write("</letStatement>\n")
+
+
 
     def compile_while(self) -> None:
         """Compiles a while statement."""
 
         self.eat("while")
-        output = "<whileStatment>\n\t" \
-                 "<keyword>" + str(self.tokenizer.cur_token) + "</keyword>\n"
+        output = "<whileStatement>\n" \
+                 "<keyword>" + self.tokenizer.cur_token + "</keyword>\n"
         self.eat("(")
         output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
+        self.output.write(output)
+        output = ""
         self.compile_expression()
         self.eat(")")
         output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
         self.eat("{")
         output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
+        self.output.write(output)
+        output = ""
         self.compile_statements()
         self.eat("}")
         output += "<symbol>" + self.tokenizer.cur_token + "</symbol>\n"
+        self.output.write(output)
+        self.output.write("</whileStatement>\n")
 
     def compile_return(self) -> None:
         """Compiles a return statement."""
@@ -110,8 +126,21 @@ class CompilationEngine:
 
     def compile_if(self) -> None:
         """Compiles a if statement, possibly with a trailing else clause."""
-        # Your code goes here!
-        pass
+        self.eat("if")
+        self.output.write("<ifStatement>\n<keyword>" + self.tokenizer.cur_token + "</keyword>\n")
+        self.eat("(")
+        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
+        self.compile_expression()
+        self.eat(")")
+        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
+        self.eat("{")
+        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
+        self.compile_statements()
+        self.eat("}")
+        self.output.write("<symbol>" + self.tokenizer.cur_token + "</symbol>\n")
+        self.output.write("</ifStatement>\n")
+
+
 
     def compile_expression(self) -> None:
         """Compiles an expression."""

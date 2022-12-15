@@ -10,15 +10,15 @@ import typing
 import JackTokenizer
 
 
-
-
 class CompilationEngine:
     """Gets input from a JackTokenizer and emits its parsed structure into an
     output stream.
     """
     dict = {"KEYWORD": "keywords", "SYMBOL": "symbol", "INT_CONST": "integerConstant",
-                  "STRING_CONST":"stringConstant", "IDENTIFIER":"identifier"}
+            "STRING_CONST": "stringConstant", "IDENTIFIER": "identifier"}
 
+    tabs = 0
+    # TODO combine write label and write tabs
 
     def __init__(self, input_stream: "JackTokenizer", output_stream) -> None:
         """
@@ -36,7 +36,7 @@ class CompilationEngine:
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
-        self.output.write("<class>\n")
+        self.write_tabs("open", "class")
         self.eat("class")
         self.write_out()
         self.eat("{")
@@ -45,11 +45,11 @@ class CompilationEngine:
         while self.tokenizer.cur_token in ["constructor", "function", "method"]:
             self.compile_subroutine()
         self.eat("}")
-        self.output.write("</class>\n")
+        self.write_tabs("close", "class")
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
-        self.output.write("<varDec>\n")
+        self.write_tabs("open", "varDec")
         self.eat("var")
         # TODO do i need to parse which type it is specifically
         self.write_out()
@@ -58,7 +58,7 @@ class CompilationEngine:
             self.eat(",")
             self.write_out()
         self.eat(";")
-        self.output.write("</varDec>\n")
+        self.write_tabs("close", "varDec")
 
     def compile_subroutine(self) -> None:
         """
@@ -85,7 +85,7 @@ class CompilationEngine:
         """Compiles a sequence of statements, not including the enclosing 
         "{}".
         """
-        self.output.write("<statements>\n")
+        self.write_tabs("open", "statements")
         while self.tokenizer.cur_token in ["if", "while", "let", "do", "return"]:
             if self.tokenizer.cur_token == "if":
                 self.compile_if()
@@ -97,12 +97,10 @@ class CompilationEngine:
                 self.compile_do()
             elif self.tokenizer.cur_token == "return":
                 self.compile_return()
-        self.output.write("</statements>\n")
-
-
+        self.write_tabs("close", "statements")
     def compile_do(self) -> None:
         """Compiles a do statement."""
-        self.output.write("<doStatement>\n")
+        self.write_tabs("open","doStatement")
         self.eat("do")
         self.write_out()
         if self.tokenizer.cur_token == ".":
@@ -113,28 +111,19 @@ class CompilationEngine:
             self.eat(")")
         else:
             self.write_out()
-            self.output.write("</doStatement>\n")
-
-
-
-
+            self.write_tabs("close", "doStatement")
     def compile_let(self) -> None:
         """Compiles a let statement."""
-
-        self.output.write("<letStatement>\n")
+        self.write_tabs("open", "letStatement")
         self.eat("let")
         self.write_out()
         self.eat("=")
         self.compile_expression()
         self.eat(";")
-        self.output.write("</letStatement>\n")
-
-
-
+        self.write_tabs("close", "letStatement")
     def compile_while(self) -> None:
         """Compiles a while statement."""
-
-        self.output.write("<whileStatement>\n")
+        self.write_tabs("open","whileStatement")
         self.eat('while')
         self.eat("(")
         self.compile_expression()
@@ -142,20 +131,20 @@ class CompilationEngine:
         self.eat("{")
         self.compile_statements()
         self.eat("}")
-        self.output.write("</whileStatement>\n")
+        self.write_tabs("close","whileStatement")
 
     def compile_return(self) -> None:
         """Compiles a return statement."""
-        self.output.write("<returnStatement>\n")
+        self.write_tabs("open","return")
         self.eat("return")
         if self.tokenizer.cur_token != ";":
             self.compile_expression()
         self.eat(";")
-        self.output.write("<returnStatement>\n")
+        self.write_tabs("close","return")
 
     def compile_if(self) -> None:
         """Compiles a if statement, possibly with a trailing else clause."""
-        self.output.write("<ifStatement>\n")
+        self.write_tabs("open","ifStatement")
         self.eat("if")
         self.eat("(")
         self.compile_expression()
@@ -163,19 +152,17 @@ class CompilationEngine:
         self.eat("{")
         self.compile_statements()
         self.eat("}")
-        self.output.write("</ifStatement>\n")
-
-
+        self.write_tabs("close","ifStatement")
 
     def compile_expression(self) -> None:
         """Compiles an expression."""
         # Your code goes here!
-        self.output.write("<expression>\n")
+        self.write_tabs("open", "expression")
         self.compile_term()
-        if self.tokenizer.cur_token in ['+','-','*',"/", "&", "|", "<", ">", "="]:
+        if self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
             self.write_out()
             self.compile_term()
-        self.output.write("</expression>\n")
+        self.write_tabs("close", "expression")
 
     def compile_term(self) -> None:
         """Compiles a term. 
@@ -188,7 +175,7 @@ class CompilationEngine:
         part of this term and should not be advanced over.
         """
         # Your code goes here!
-        self.output.write("<term>\n")
+        self.write_tabs("open", "term")
         prev_token = self.tokenizer.cur_token
         self.write_out()
         if prev_token == "IDENTIFIER":
@@ -204,20 +191,18 @@ class CompilationEngine:
                 self.eat("[")
                 self.compile_expression()
                 self.eat("]")
-            elif self.tokenizer.cur_token in ['-','~']:
+            elif self.tokenizer.cur_token in ['-', '~']:
                 self.write_out()
-        self.output.write("</term>\n")
-
+        self.write_tabs("close", "term")
 
     def compile_expression_list(self) -> None:
         """Compiles a (possibly empty) comma-separated list of expressions."""
-        self.output.write("<expressionList>\n")
+        self.write_tabs("open","expressionList")
         while self.tokenizer.cur_token != ")":
             self.compile_expression()
             if self.tokenizer.cur_token == ",":
                 self.eat(",")
-        self.output.write("</expressionList>\n")
-
+        self.write_tabs("close","expressionList")
 
     def eat(self, string):
         if self.tokenizer.cur_token != string:
@@ -226,13 +211,20 @@ class CompilationEngine:
             self.write_out()
 
     def write_out(self):
+        self.write_tabs()
         type = self.tokenizer.token_type()
-        self.output.write("<" + self.dict[type] + ">" + self.tokenizer.cur_token +"</" + self.dict[type] + ">\n")
+        self.output.write("<" + self.dict[type] + ">" + self.tokenizer.cur_token + "</" + self.dict[type] + ">\n")
         self.tokenizer.advance()
 
+    def write_tabs(self, state=None, token=None):
+        if state == "open":
+            self.tabs += 1
+            self.output.write("\t" * self.tabs + "<" + token + ">\n")
+        elif state == "close":
+            self.output.write("\t" * self.tabs + "</" + token + ">\n")
+            self.tabs -= 1
+        else:
+            self.output.write("\t" * self.tabs)
 
-
-#TODO subrutine
-#TODO param list
-
-
+# TODO subrutine
+# TODO param list

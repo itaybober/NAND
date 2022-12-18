@@ -10,6 +10,27 @@ import typing
 import JackTokenizer
 
 
+NON_VALID_TYPE = ['class', 'constructor', 'function', 'method', 'field',
+           'static', 'var','true',
+           'false', 'null', 'this', 'let', 'do', 'if', 'else',
+           'while', 'return','{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
+           '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#','0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+NON_VALID_NAME = ['class', 'constructor', 'function', 'method', 'field',
+           'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
+           'false', 'null', 'this', 'let', 'do', 'if', 'else',
+           'while', 'return','{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
+           '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
+           'static', 'var', 'int', 'char', 'boolean', 'void', 'true',
+           'false', 'null', 'this', 'let', 'do', 'if', 'else',
+           'while', 'return']
+SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
+           '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#']
+INTEGERS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+
 class CompilationEngine:
     """Gets input from a JackTokenizer and emits its parsed structure into an
     output stream.
@@ -33,12 +54,14 @@ class CompilationEngine:
         self.tokenizer = input_stream
         self.output = output_stream
         self.output.write("<tokens>\n")
+        self.compile_class()
+        self.output.write("</tokens>\n")
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
         self.write_tabs("open", "class")
         self.eat("class")
-        self.write_out()
+        self.is_valid_type()
         self.eat("{")
         while self.tokenizer.cur_token in ["static", "field"]:
             self.compile_class_var_dec()
@@ -52,11 +75,11 @@ class CompilationEngine:
         self.write_tabs("open", "varDec")
         self.eat("var")
         # TODO do i need to parse which type it is specifically
-        self.write_out()
-        self.write_out()
+        self.is_valid_type()
+        self.is_valid_name()
         while self.tokenizer.cur_token != ";":
             self.eat(",")
-            self.write_out()
+            self.is_valid_name()
         self.eat(";")
         self.write_tabs("close", "varDec")
 
@@ -74,13 +97,27 @@ class CompilationEngine:
         """Compiles a (possibly empty) parameter list, not including the 
         enclosing "()".
         """
-        # Your code goes here!
-        pass
+        self.write_tabs("open", "parameterList")
+        if self.tokenizer.cur_token != ")":
+            self.is_valid_type()
+            self.is_valid_name()
+            while self.tokenizer.cur_token == ",":
+                self.eat(",")
+                self.is_valid_type()
+                self.is_valid_name()
+        self.write_tabs("close", "parameterList")
 
     def compile_var_dec(self) -> None:
         """Compiles a var declaration."""
-        # Your code goes here!
-        pass
+        self.write_tabs("open", "varDec")
+        self.eat("var")
+        self.is_valid_type()
+        self.is_valid_name()
+        while self.tokenizer.cur_token == ",":
+            self.eat(",")
+            self.is_valid_name()
+        self.eat(";")
+        self.write_tabs("close", "varDec")
 
     def compile_statements(self) -> None:
         """Compiles a sequence of statements, not including the enclosing 
@@ -227,5 +264,16 @@ class CompilationEngine:
         else:
             self.output.write("\t" * self.tabs)
 
-# TODO subrutine
-# TODO param list
+
+
+    def is_valid_type(self):
+        if self.tokenizer.cur_token in NON_VALID_TYPE:
+            self.eat(1)
+        self.write_out()
+
+    def is_valid_name(self):
+        if self.tokenizer.cur_token in NON_VALID_NAME:
+            self.eat(1)
+        if self.tokenizer.cur_token[0] in INTEGERS:
+            self.eat(1)
+        self.write_out()

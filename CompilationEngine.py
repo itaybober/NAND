@@ -89,9 +89,28 @@ class CompilationEngine:
         You can assume that classes with constructors have at least one field,
         you will understand why this is necessary in project 11.
         """
-        # Your code goes here!
-        # Your mom says hi
-        pass
+        self.write_tabs("open", "subroutineDec")
+        if self.tokenizer.cur_token == "constructor":
+            self.eat("constructor")
+        elif self.tokenizer.cur_token == "function":
+            self.eat("function")
+        elif self.tokenizer.cur_token == "method":
+            self.eat("method")
+        else:
+            self.eat(1)
+        if self.tokenizer.cur_token == "void":
+            self.eat("void")
+        else:
+            self.is_valid_type()
+        self.is_valid_name()
+        self.eat("(")
+        self.compile_parameter_list()
+        self.eat(")")
+        self.compile_subroutine_body()
+        self.write_tabs("close", "subroutineDec")
+
+
+
 
     def compile_parameter_list(self) -> None:
         """Compiles a (possibly empty) parameter list, not including the 
@@ -136,6 +155,7 @@ class CompilationEngine:
             elif self.tokenizer.cur_token == "return":
                 self.compile_return()
         self.write_tabs("close", "statements")
+
     def compile_do(self) -> None:
         """Compiles a do statement."""
         self.write_tabs("open","doStatement")
@@ -150,6 +170,7 @@ class CompilationEngine:
         else:
             self.write_out()
             self.write_tabs("close", "doStatement")
+
     def compile_let(self) -> None:
         """Compiles a let statement."""
         self.write_tabs("open", "letStatement")
@@ -159,6 +180,7 @@ class CompilationEngine:
         self.compile_expression()
         self.eat(";")
         self.write_tabs("close", "letStatement")
+
     def compile_while(self) -> None:
         """Compiles a while statement."""
         self.write_tabs("open","whileStatement")
@@ -264,7 +286,14 @@ class CompilationEngine:
         else:
             self.output.write("\t" * self.tabs)
 
-
+    def compile_subroutine_body(self):
+        self.write_tabs("open", "subroutineBody")
+        self.eat("{")
+        while self.tokenizer.cur_token == "var":
+            self.compile_var_dec()
+        self.compile_statements()
+        self.eat("}")
+        self.write_tabs("close", "subroutineBody")
 
     def is_valid_type(self):
         if self.tokenizer.cur_token in NON_VALID_TYPE:

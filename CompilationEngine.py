@@ -35,11 +35,10 @@ class CompilationEngine:
     """Gets input from a JackTokenizer and emits its parsed structure into an
     output stream.
     """
-    dict = {"KEYWORD": "keywords", "SYMBOL": "symbol", "INT_CONST": "integerConstant",
+    dict = {"KEYWORD": "keyword", "SYMBOL": "symbol", "INT_CONST": "integerConstant",
             "STRING_CONST": "stringConstant", "IDENTIFIER": "identifier"}
 
     tabs = 0
-    # TODO combine write label and write tabs
 
     def __init__(self, input_stream: "JackTokenizer", output_stream) -> None:
         """
@@ -53,9 +52,7 @@ class CompilationEngine:
         # output_stream.write("Hello world! \n")
         self.tokenizer = input_stream
         self.output = output_stream
-        self.output.write("<tokens>\n")
         self.compile_class()
-        self.output.write("</tokens>\n")
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
@@ -74,7 +71,6 @@ class CompilationEngine:
         """Compiles a static declaration or a field declaration."""
         self.write_tabs("open", "varDec")
         self.eat("var")
-        # TODO do i need to parse which type it is specifically
         self.is_valid_type()
         self.is_valid_name()
         while self.tokenizer.cur_token != ";":
@@ -273,18 +269,18 @@ class CompilationEngine:
     def write_out(self):
         self.write_tabs()
         type = self.tokenizer.token_type()
-        self.output.write("<" + self.dict[type] + ">" + self.tokenizer.cur_token + "</" + self.dict[type] + ">\n")
+        self.output.write("<" + self.dict[type] + "> " + self.tokenizer.cur_token + " </" + self.dict[type] + ">\n")
         self.tokenizer.advance()
 
     def write_tabs(self, state=None, token=None):
         if state == "open":
-            self.output.write("\t" * self.tabs + "<" + token + ">\n")
+            self.output.write("  " * self.tabs + "<" + token + ">\n")
             self.tabs += 1
         elif state == "close":
             self.tabs -= 1
-            self.output.write("\t" * self.tabs + "</" + token + ">\n")
+            self.output.write("  " * self.tabs + "</" + token + ">\n")
         else:
-            self.output.write("\t" * self.tabs)
+            self.output.write("  " * self.tabs)
 
     def compile_subroutine_body(self):
         self.write_tabs("open", "subroutineBody")

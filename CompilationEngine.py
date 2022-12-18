@@ -219,11 +219,11 @@ class CompilationEngine:
 
     def write_tabs(self, state=None, token=None):
         if state == "open":
-            self.tabs += 1
             self.output.write("\t" * self.tabs + "<" + token + ">\n")
+            self.tabs += 1
         elif state == "close":
-            self.output.write("\t" * self.tabs + "</" + token + ">\n")
             self.tabs -= 1
+            self.output.write("\t" * self.tabs + "</" + token + ">\n")
         else:
             self.output.write("\t" * self.tabs)
 

@@ -143,7 +143,7 @@ class CompilationEngine:
             if self.tokenizer.cur_token == "if":
                 self.compile_if()
             elif self.tokenizer.cur_token == "let":
-                self.compile_if()
+                self.compile_let()
             elif self.tokenizer.cur_token == "while":
                 self.compile_while()
             elif self.tokenizer.cur_token == "do":
@@ -154,24 +154,21 @@ class CompilationEngine:
 
     def compile_do(self) -> None:
         """Compiles a do statement."""
-        self.write_tabs("open","doStatement")
+        self.write_tabs("open", "doStatement")
         self.eat("do")
-        self.write_out()
-        if self.tokenizer.cur_token == ".":
-            self.eat(".")
-            self.write_out()
-            self.eat("(")
-            self.compile_expression_list()
-            self.eat(")")
-        else:
-            self.write_out()
-            self.write_tabs("close", "doStatement")
+        self.compile_subroutine_call()
+        self.eat(";")
+        self.write_tabs("close", "doStatement")
 
     def compile_let(self) -> None:
         """Compiles a let statement."""
         self.write_tabs("open", "letStatement")
         self.eat("let")
-        self.write_out()
+        self.is_valid_name()
+        if self.tokenizer.cur_token == "[":
+            self.eat("[")
+            self.compile_expression()
+            self.eat("]")
         self.eat("=")
         self.compile_expression()
         self.eat(";")
@@ -191,12 +188,12 @@ class CompilationEngine:
 
     def compile_return(self) -> None:
         """Compiles a return statement."""
-        self.write_tabs("open","return")
+        self.write_tabs("open","returnStatement")
         self.eat("return")
         if self.tokenizer.cur_token != ";":
             self.compile_expression()
         self.eat(";")
-        self.write_tabs("close","return")
+        self.write_tabs("close","returnStatement")
 
     def compile_if(self) -> None:
         """Compiles a if statement, possibly with a trailing else clause."""
@@ -232,23 +229,33 @@ class CompilationEngine:
         """
         # Your code goes here!
         self.write_tabs("open", "term")
-        prev_token = self.tokenizer.cur_token
-        self.write_out()
-        if prev_token == "IDENTIFIER":
-            if self.tokenizer.cur_token == ".":
-                self.eat(".")
-                self.compile_subroutine()
-            elif self.tokenizer.cur_token == "(":
-                self.eat("(")
-                # TODO this is definetly wrong
-                self.compile_expression()
-                self.eat(")")
-            elif self.tokenizer.cur_token == "[":
+        if self.tokenizer.token_type() == "IDENTIFIER":
+            self.is_valid_name()
+            if self.tokenizer.cur_token == "[":
                 self.eat("[")
                 self.compile_expression()
                 self.eat("]")
-            elif self.tokenizer.cur_token in ['-', '~']:
-                self.write_out()
+            elif self.tokenizer.cur_token == "(":
+                self.eat("(")
+                self.compile_expression_list()
+                self.eat(")")
+            elif self.tokenizer.cur_token == ".":
+                self.eat(".")
+                self.is_valid_name()
+                self.eat("(")
+                self.compile_expression_list()
+                self.eat(")")
+        elif self.tokenizer.cur_token == "(":
+            self.eat("(")
+            self.compile_expression()
+            self.eat(")")
+        elif self.tokenizer.cur_token in ["-","~"]:
+            self.write_out()
+
+
+
+        else:
+            self.write_out()
         self.write_tabs("close", "term")
 
     def compile_expression_list(self) -> None:
@@ -268,8 +275,20 @@ class CompilationEngine:
 
     def write_out(self):
         self.write_tabs()
+        value = "ERROR"
         type = self.tokenizer.token_type()
-        self.output.write("<" + self.dict[type] + "> " + self.tokenizer.cur_token + " </" + self.dict[type] + ">\n")
+        if type == "IDENTIFIER":
+            value = self.tokenizer.identifier()
+        if type == "INTEGER":
+            value = self.tokenizer.int_val()
+        if type == "STRING":
+            value = self.tokenizer.string_val()
+        if type == "SYMBOL":
+            value = self.tokenizer.symbol()
+        if type == "KEYWORD":
+            value = self.tokenizer.keyword()
+
+        self.output.write("<" + self.dict[type] + "> " + value + " </" + self.dict[type] + ">\n")
         self.tokenizer.advance()
 
     def write_tabs(self, state=None, token=None):
@@ -302,3 +321,12 @@ class CompilationEngine:
         if self.tokenizer.cur_token[0] in INTEGERS:
             self.eat(1)
         self.write_out()
+
+    def compile_subroutine_call(self):
+        self.is_valid_name()
+        if self.tokenizer.cur_token == ".":
+            self.eat(".")
+            self.is_valid_name()
+        self.eat("(")
+        self.compile_expression_list()
+        self.eat(")")

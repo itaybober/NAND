@@ -13,7 +13,7 @@ KEYORDS = ['class', 'constructor', 'function', 'method', 'field',
            'false', 'null', 'this', 'let', 'do', 'if', 'else',
            'while', 'return']
 SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
-           '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#']
+           '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#', '|']
 INTEGERS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 
@@ -122,7 +122,7 @@ class JackTokenizer:
                     in_comment = True
                 if not in_comment:
                     self.input_lines[i] += cur_line[j]
-                if cur_line[j] == "/" and cur_line[j-1] == "*":
+                if cur_line[j] == "/" and j-1 >= 0 and cur_line[j-1] == "*":
                     in_comment = False
 
         self.input_tokens = []

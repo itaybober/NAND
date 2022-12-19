@@ -69,15 +69,20 @@ class CompilationEngine:
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
-        self.write_tabs("open", "varDec")
-        self.eat("var")
+        self.write_tabs("open", "classVarDec")
+        if self.tokenizer.cur_token == "static":
+            self.eat("static")
+        elif self.tokenizer.cur_token == "field":
+            self.eat("field")
+        else:
+            self.eat(1)
         self.is_valid_type()
         self.is_valid_name()
         while self.tokenizer.cur_token != ";":
             self.eat(",")
             self.is_valid_name()
         self.eat(";")
-        self.write_tabs("close", "varDec")
+        self.write_tabs("close", "classVarDec")
 
     def compile_subroutine(self) -> None:
         """
@@ -205,6 +210,11 @@ class CompilationEngine:
         self.eat("{")
         self.compile_statements()
         self.eat("}")
+        if self.tokenizer.cur_token == "else":
+            self.eat("else")
+            self.eat("{")
+            self.compile_statements()
+            self.eat("}")
         self.write_tabs("close","ifStatement")
 
     def compile_expression(self) -> None:
@@ -251,9 +261,7 @@ class CompilationEngine:
             self.eat(")")
         elif self.tokenizer.cur_token in ["-","~"]:
             self.write_out()
-
-
-
+            self.compile_term()
         else:
             self.write_out()
         self.write_tabs("close", "term")

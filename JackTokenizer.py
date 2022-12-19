@@ -146,7 +146,7 @@ class JackTokenizer:
 
             for letter in phrase:
 
-                if letter == "\"" or letter == "\'":
+                if letter == "\"":
                     if not string_var:
                         string_var = True
                         word += letter

@@ -222,7 +222,7 @@ class CompilationEngine:
         # Your code goes here!
         self.write_tabs("open", "expression")
         self.compile_term()
-        if self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
+        while self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
             self.write_out()
             self.compile_term()
         self.write_tabs("close", "expression")

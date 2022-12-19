@@ -279,16 +279,16 @@ class CompilationEngine:
         type = self.tokenizer.token_type()
         if type == "IDENTIFIER":
             value = self.tokenizer.identifier()
-        if type == "INTEGER":
+        if type == "INT_CONST":
             value = self.tokenizer.int_val()
-        if type == "STRING":
+        if type == "STRING_CONST":
             value = self.tokenizer.string_val()
         if type == "SYMBOL":
             value = self.tokenizer.symbol()
         if type == "KEYWORD":
             value = self.tokenizer.keyword()
 
-        self.output.write("<" + self.dict[type] + "> " + value + " </" + self.dict[type] + ">\n")
+        self.output.write("<" + self.dict[type] + "> " + str(value) + " </" + self.dict[type] + ">\n")
         self.tokenizer.advance()
 
     def write_tabs(self, state=None, token=None):

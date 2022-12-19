@@ -245,7 +245,7 @@ class JackTokenizer:
             "BOOLEAN", "CHAR", "VOID", "VAR", "STATIC", "FIELD", "LET", "DO", 
             "IF", "ELSE", "WHILE", "RETURN", "TRUE", "FALSE", "NULL", "THIS"
         """
-        return self.cur_token.upper()
+        return self.cur_token
 
 
     def symbol(self) -> str:
@@ -258,13 +258,13 @@ class JackTokenizer:
               '-' | '*' | '/' | '&' | '|' | '<' | '>' | '=' | '~' | '^' | '#'
         """
         if self.cur_token == '&':
-            return "&amp"
+            return "&amp;"
         if self.cur_token == '"':
-            return "&quot"
+            return "&quot;"
         if self.cur_token == '>':
-            return "&gt"
+            return "&gt;"
         if self.cur_token == '<':
-            return "&lt"
+            return "&lt;"
         return self.cur_token
 
 
@@ -302,4 +302,4 @@ class JackTokenizer:
                       double quote or newline '"'
         """
 
-        return self.cur_token
+        return self.cur_token.replace("\"", "")

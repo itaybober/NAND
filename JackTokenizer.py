@@ -111,16 +111,19 @@ class JackTokenizer:
         # A good place to start is to read all the lines of the input:
         self.input_lines = input_stream.read().splitlines()
         in_comment = False
+        in_string = False
         # rids all of the commented lines
         for i in range(len(self.input_lines)):
             cur_line = self.input_lines[i]
             self.input_lines[i] = ""
             for j in range(len(cur_line)):
-                if not in_comment and cur_line[j] == '/' and cur_line[j+1] == "/":
+                if cur_line[j] == "\"":
+                    in_string = not in_string
+                if not in_string and not in_comment and cur_line[j] == '/' and cur_line[j+1] == "/":
                     break
-                if not in_comment and cur_line[j] == "/" and cur_line[j+1] == "*":
+                if not in_string and not in_comment and cur_line[j] == "/" and cur_line[j+1] == "*":
                     in_comment = True
-                if not in_comment:
+                if not in_string and not in_comment:
                     self.input_lines[i] += cur_line[j]
                 if cur_line[j] == "/" and j-1 >= 0 and cur_line[j-1] == "*":
                     in_comment = False

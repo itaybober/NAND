@@ -301,5 +301,4 @@ class JackTokenizer:
             StringConstant: '"' A sequence of Unicode characters not including 
                       double quote or newline '"'
         """
-
-        return self.cur_token.replace("\"", "")
+        return self.cur_token[1:-1]

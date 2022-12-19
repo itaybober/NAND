@@ -123,9 +123,9 @@ class JackTokenizer:
                     break
                 if not in_string and not in_comment and cur_line[j] == "/" and cur_line[j+1] == "*":
                     in_comment = True
-                if not in_string and not in_comment:
+                if not in_comment:
                     self.input_lines[i] += cur_line[j]
-                if cur_line[j] == "/" and j-1 >= 0 and cur_line[j-1] == "*":
+                if not in_string and cur_line[j] == "/" and j-1 >= 0 and cur_line[j-1] == "*":
                     in_comment = False
 
         self.input_tokens = []
@@ -167,13 +167,13 @@ class JackTokenizer:
 
 
                 if word != "":
-                    if letter == " ":
+                    if letter == " " or letter == "\t":
                         clean.append(word)
                         word = ""
 
 
                 elif number != "":
-                    if letter == " ":
+                    if letter == " " or letter == "\t":
                         clean.append(number)
                         number = ""
 

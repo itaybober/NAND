@@ -277,7 +277,7 @@ class CompilationEngine:
 
     def eat(self, string):
         if self.tokenizer.cur_token != string:
-            raise Exception("Expected different string")
+            raise Exception("\n     Expected: " + string+"\n     Recieved: "+ self.tokenizer.cur_token + "\nfileName: " + self.output.name)
         else:
             self.write_out()
 

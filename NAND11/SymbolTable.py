@@ -19,6 +19,11 @@ class SymbolTable:
         self.class_table = {"STATIC": [], "FIELD": []}
         self.subroutine_table = {}
 
+    def __str__(self):
+        return str(self.class_table)
+
+
+
     def start_subroutine(self) -> None:
         """Starts a new subroutine scope (i.e., resets the subroutine's 
         symbol table).
@@ -43,7 +48,7 @@ class SymbolTable:
             self.class_table["STATIC"].append((name, type))
         elif kind == "VAR":
             self.subroutine_table["VAR"].append((name, type))
-        elif kind == "ARG":
+        else:
             self.subroutine_table["ARG"].append((name, type))
 
 

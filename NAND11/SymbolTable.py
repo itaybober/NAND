@@ -16,15 +16,15 @@ class SymbolTable:
 
     def __init__(self) -> None:
         """Creates a new empty symbol table."""
-        # Your code goes here!
-        pass
+        self.class_table = {"STATIC": [], "FIELD": []}
+        self.subroutine_table = {}
 
     def start_subroutine(self) -> None:
         """Starts a new subroutine scope (i.e., resets the subroutine's 
         symbol table).
         """
-        # Your code goes here!
-        pass
+        self.subroutine_table = {"VAR": [], "ARG": []}
+
 
     def define(self, name: str, type: str, kind: str) -> None:
         """Defines a new identifier of a given name, type and kind and assigns 
@@ -37,8 +37,16 @@ class SymbolTable:
             kind (str): the kind of the new identifier, can be:
             "STATIC", "FIELD", "ARG", "VAR".
         """
-        # Your code goes here!
-        pass
+        if kind == "FIELD":
+            self.class_table["FIELD"].append((name, type))
+        elif kind == "STATIC":
+            self.class_table["STATIC"].append((name, type))
+        elif kind == "VAR":
+            self.subroutine_table["VAR"].append((name, type))
+        elif kind == "ARG":
+            self.subroutine_table["ARG"].append((name, type))
+
+
 
     def var_count(self, kind: str) -> int:
         """
@@ -72,8 +80,19 @@ class SymbolTable:
         Returns:
             str: the type of the named identifier in the current scope.
         """
-        # Your code goes here!
-        pass
+        for (var_name, type) in self.class_table["STATIC"]:
+            if var_name == name:
+                return type
+        for (var_name, type) in self.class_table["FIELD"]:
+            if var_name == name:
+                return type
+        for (var_name, type) in self.subroutine_table["ARG"]:
+            if var_name == name:
+                return type
+        for (var_name, type) in self.subroutine_table["VAR"]:
+            if var_name == name:
+                return type
+
 
     def index_of(self, name: str) -> int:
         """

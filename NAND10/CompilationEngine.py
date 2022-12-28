@@ -57,7 +57,7 @@ class CompilationEngine:
     def compile_class(self) -> None:
         """Compiles a complete class."""
         self.write_tabs("open", "class")
-        self.symtable = SymbolTable()
+        self.symtable = SymbolTable
         self.eat("class")
         self.is_valid_type()
         self.eat("{")
@@ -100,6 +100,7 @@ class CompilationEngine:
         You can assume that classes with constructors have at least one field,
         you will understand why this is necessary in project 11.
         """
+        self.symtable.start_subroutine()
         self.write_tabs("open", "subroutineDec")
         if self.tokenizer.cur_token == "constructor":
             self.eat("constructor")
@@ -127,26 +128,47 @@ class CompilationEngine:
         """Compiles a (possibly empty) parameter list, not including the 
         enclosing "()".
         """
+
         self.write_tabs("open", "parameterList")
         if self.tokenizer.cur_token != ")":
+            kind = "ARG"
+            name_type_list = []
+            var_type1 = self.tokenizer.cur_token
             self.is_valid_type()
+            name1 = self.tokenizer.cur_token
             self.is_valid_name()
+            name_type_list.append((name1, var_type1))
+
             while self.tokenizer.cur_token == ",":
                 self.eat(",")
+                var_type = self.tokenizer.cur_token
                 self.is_valid_type()
+                name = self.tokenizer.cur_token
                 self.is_valid_name()
+                name_type_list.append((name, var_type))
+
+            for (name, var_type) in name_type_list:
+                self.symtable.define(name, var_type, kind)
+
         self.write_tabs("close", "parameterList")
 
     def compile_var_dec(self) -> None:
         """Compiles a var declaration."""
         self.write_tabs("open", "varDec")
+        kind = "VAR"
         self.eat("var")
+        var_type = self.tokenizer.cur_token
         self.is_valid_type()
+        names = []
+        names.append(self.tokenizer.cur_token)
         self.is_valid_name()
         while self.tokenizer.cur_token == ",":
             self.eat(",")
+            names.append(self.tokenizer.cur_token)
             self.is_valid_name()
         self.eat(";")
+        for name in names:
+            self.symtable.define(name, var_type, kind)
         self.write_tabs("close", "varDec")
 
     def compile_statements(self) -> None:

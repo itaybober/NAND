@@ -18,7 +18,8 @@ class VMWriter:
         # Your code goes here!
         # Note that you can write to output_stream like so:
         # output_stream.write("Hello world! \n")
-        pass
+
+        self.output = output_stream
 
     def write_push(self, segment: str, index: int) -> None:
         """Writes a VM push command.
@@ -28,8 +29,7 @@ class VMWriter:
             "LOCAL", "STATIC", "THIS", "THAT", "POINTER", "TEMP"
             index (int): the index to push to.
         """
-        # Your code goes here!
-        pass
+        self.output.write("push " + segment + str(index) + "\n")
 
     def write_pop(self, segment: str, index: int) -> None:
         """Writes a VM pop command.
@@ -40,7 +40,8 @@ class VMWriter:
             index (int): the index to pop from.
         """
         # Your code goes here!
-        pass
+        self.output.write("pop " + segment + str(index) + "\n")
+
 
     def write_arithmetic(self, command: str) -> None:
         """Writes a VM arithmetic command.
@@ -50,7 +51,11 @@ class VMWriter:
             "EQ", "GT", "LT", "AND", "OR", "NOT", "SHIFTLEFT", "SHIFTRIGHT".
         """
         # Your code goes here!
-        pass
+        if command in ["ADD", "SUB", "NEG", "EQ", "GT", "LT", "AND", "OR", "NOT"]:
+            self.output.write(command.lower())
+        else:
+            raise ArithmeticError("no good my boy you did not handle dis")
+
 
     def write_label(self, label: str) -> None:
         """Writes a VM label command.

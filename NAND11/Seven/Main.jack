@@ -12,5 +12,4 @@ class Main {
       do Output.printInt(1 + (2 * 3));
       return;
    }
-
 }

@@ -57,7 +57,7 @@ class CompilationEngine:
     def compile_class(self) -> None:
         """Compiles a complete class."""
         self.write_tabs("open", "class")
-        self.symtable = SymbolTable
+        self.symtable = SymbolTable()
         self.eat("class")
         self.is_valid_type()
         self.eat("{")
@@ -119,6 +119,7 @@ class CompilationEngine:
         self.compile_parameter_list()
         self.eat(")")
         self.compile_subroutine_body()
+        print(self.symtable)
         self.write_tabs("close", "subroutineDec")
 
 

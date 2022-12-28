@@ -20,7 +20,7 @@ class SymbolTable:
         self.subroutine_table = {}
 
     def __str__(self):
-        return str(self.class_table)
+        return "class table: " + str(self.class_table) + "\n" + "sub_table: " + str(self.subroutine_table)
 
 
 

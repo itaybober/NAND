@@ -6,9 +6,8 @@ as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
-from NAND11 import SymbolTable
 import JackTokenizer
-
+from NAND11.SymbolTable import SymbolTable
 
 NON_VALID_TYPE = ['class', 'constructor', 'function', 'method', 'field',
            'static', 'var','true',

@@ -16,15 +16,18 @@ class SymbolTable:
 
     def __init__(self) -> None:
         """Creates a new empty symbol table."""
-        # Your code goes here!
-        pass
+        self.class_table = {"STATIC": [], "FIELD": []}
+        self.subroutine_table = {}
+
+
 
     def start_subroutine(self) -> None:
         """Starts a new subroutine scope (i.e., resets the subroutine's 
         symbol table).
         """
-        # Your code goes here!
-        pass
+        self.subroutine_table = {"ARG": [], "VAR": []}
+
+
 
     def define(self, name: str, type: str, kind: str) -> None:
         """Defines a new identifier of a given name, type and kind and assigns 
@@ -49,8 +52,9 @@ class SymbolTable:
             int: the number of variables of the given kind already defined in 
             the current scope.
         """
-        # Your code goes here!
-        pass
+        if kind in ["STATIC", "FIELD"]:
+            return len(self.class_table[kind])
+        return len(self.subroutine_table[kind])
 
     def kind_of(self, name: str) -> str:
         """
@@ -61,8 +65,17 @@ class SymbolTable:
             str: the kind of the named identifier in the current scope, or None
             if the identifier is unknown in the current scope.
         """
-        # Your code goes here!
-        pass
+        for (var_name, var_type) in self.subroutine_table["ARG"]:
+            if var_name == name:
+                return "ARG"
+        for (var_name, var_type) in self.subroutine_table["VAR"]:
+            if var_name == name:
+                return "VAR"
+        for (var_name, var_type) in self.subroutine_table["STATIC"]:
+            if var_name == name:
+                return "STATIC"
+        return "FIELD"
+
 
     def type_of(self, name: str) -> str:
         """
@@ -84,4 +97,23 @@ class SymbolTable:
             int: the index assigned to the named identifier.
         """
         # Your code goes here!
-        pass
+        index = 0
+        for (var_name, var_type) in self.subroutine_table["ARG"]:
+            if var_name == name:
+                return index
+            index += 1
+        index = 0
+        for (var_name, var_type) in self.subroutine_table["VAR"]:
+            if var_name == name:
+                return index
+            index += 1
+        index = 0
+        for (var_name, var_type) in self.subroutine_table["STATIC"]:
+            if var_name == name:
+                return index
+            index += 1
+        index = 0
+        for (var_name, var_type) in self.subroutine_table["FIELD"]:
+            if var_name == name:
+                return index
+            index += 1

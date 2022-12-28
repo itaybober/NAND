@@ -6,7 +6,7 @@ as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
 Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
-
+from NAND11 import SymbolTable
 import JackTokenizer
 
 
@@ -50,6 +50,7 @@ class CompilationEngine:
         # Your code goes here!
         # Note that you can write to output_stream like so:
         # output_stream.write("Hello world! \n")
+        self.symtable = None
         self.tokenizer = input_stream
         self.output = output_stream
         self.compile_class()
@@ -57,6 +58,7 @@ class CompilationEngine:
     def compile_class(self) -> None:
         """Compiles a complete class."""
         self.write_tabs("open", "class")
+        self.symtable = SymbolTable()
         self.eat("class")
         self.is_valid_type()
         self.eat("{")
@@ -72,16 +74,25 @@ class CompilationEngine:
         self.write_tabs("open", "classVarDec")
         if self.tokenizer.cur_token == "static":
             self.eat("static")
+            kind = "STATIC"
         elif self.tokenizer.cur_token == "field":
             self.eat("field")
+            kind = "FIELD"
         else:
             self.eat(1)
+        var_type = self.tokenizer.cur_token
         self.is_valid_type()
+        names = []
+        names.append(self.tokenizer.cur_token)
         self.is_valid_name()
         while self.tokenizer.cur_token != ";":
             self.eat(",")
+            names.append(self.tokenizer.cur_token)
             self.is_valid_name()
         self.eat(";")
+        for name in names:
+            self.symtable.define(name, var_type, kind)
+        print(self.symtable)
         self.write_tabs("close", "classVarDec")
 
     def compile_subroutine(self) -> None:
@@ -287,6 +298,7 @@ class CompilationEngine:
         type = self.tokenizer.token_type()
         if type == "IDENTIFIER":
             value = self.tokenizer.identifier()
+
         if type == "INT_CONST":
             value = self.tokenizer.int_val()
         if type == "STRING_CONST":

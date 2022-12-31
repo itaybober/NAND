@@ -272,7 +272,7 @@ class CompilationEngine:
                 self.vm_writer.write_arithmetic(OPDICT[op])
                 self.tokenizer.advance()
             else:
-                self.vm_writer.write_function(MATHDICT[op],2)
+                self.vm_writer.write_call(MATHDICT[op], 2)
                 self.tokenizer.advance()
 
     def compile_term(self) -> None:

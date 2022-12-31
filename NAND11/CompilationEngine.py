@@ -201,6 +201,7 @@ class CompilationEngine:
         """Compiles a do statement."""
         self.eat("do")
         self.compile_subroutine_call()
+        self.vm_writer.write_pop("temp",0)
         self.eat(";")
 
     def compile_let(self) -> None:
@@ -272,7 +273,7 @@ class CompilationEngine:
                 self.vm_writer.write_arithmetic(OPDICT[op])
                 self.tokenizer.advance()
             else:
-                self.vm_writer.write_function(MATHDICT[op],2)
+                self.vm_writer.write_call(MATHDICT[op],2)
                 self.tokenizer.advance()
 
     def compile_term(self) -> None:
@@ -379,15 +380,15 @@ class CompilationEngine:
         self.write_out()
 
     def compile_subroutine_call(self):
-        function_call = self.tokenizer.cur_token
+        function_name = self.tokenizer.cur_token
         kind = self.symtable.kind_of(self.tokenizer.cur_token)
         self.tokenizer.advance()
         if self.tokenizer.cur_token == ".":
             self.eat(".")
+            function_name += "." + self.tokenizer.cur_token
             self.is_valid_name()
-            function_call += "." + self.tokenizer.cur_token
             kind = self.symtable.kind_of(self.tokenizer.cur_token)
         self.eat("(")
         call_var_num = self.compile_expression_list()
         self.eat(")")
-        self.vm_writer.write_call(function_call, call_var_num)
+        self.vm_writer.write_call(function_name, call_var_num)

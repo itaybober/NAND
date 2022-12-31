@@ -43,7 +43,7 @@ class VMWriter:
             index (int): the index to pop from.
         """
         # Your code goes here!
-        self.output.write("pop " + segment + str(index) + "\n")
+        self.output.write("pop " + segment + " " + str(index) + "\n")
 
 
     def write_arithmetic(self, command: str) -> None:

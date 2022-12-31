@@ -54,16 +54,16 @@ class CompilationEngine:
         # Your code goes here!
         # Note that you can write to output_stream like so:
         # output_stream.write("Hello world! \n")
-        self.symtable = None
+        self.symtable = SymbolTable()
         self.tokenizer = input_stream
         self.output = output_stream
+        self.vm_writer = VMWriter(output_stream)
         self.compile_class()
-        self.vm_writer = VMWriter()
+
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
         self.write_tabs("open", "class")
-        self.symtable = SymbolTable()
         self.eat("class")
         self.is_valid_type()
         self.eat("{")
@@ -315,14 +315,15 @@ class CompilationEngine:
             self.write_out()
         self.write_tabs("close", "term")
 
-    def compile_expression_list(self) -> None:
+    def compile_expression_list(self) -> int:
         """Compiles a (possibly empty) comma-separated list of expressions."""
-        self.write_tabs("open","expressionList")
+        var_count = 0
         while self.tokenizer.cur_token != ")":
+            var_count += 1
             self.compile_expression()
             if self.tokenizer.cur_token == ",":
                 self.eat(",")
-        self.write_tabs("close","expressionList")
+        return var_count
 
     def eat(self, string):
         if self.tokenizer.cur_token != string:
@@ -381,10 +382,15 @@ class CompilationEngine:
         self.write_out()
 
     def compile_subroutine_call(self):
-        self.is_valid_name()
+        function_call = self.tokenizer.cur_token
+        kind = self.symtable.kind_of(self.tokenizer.cur_token)
+        self.tokenizer.advance()
         if self.tokenizer.cur_token == ".":
             self.eat(".")
             self.is_valid_name()
+            function_call += "." + self.tokenizer.cur_token
+            kind = self.symtable.kind_of(self.tokenizer.cur_token)
         self.eat("(")
-        self.compile_expression_list()
+        call_var_num = self.compile_expression_list()
         self.eat(")")
+        self.vm_writer.write_call(function_call, call_var_num)

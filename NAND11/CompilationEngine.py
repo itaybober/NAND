@@ -31,6 +31,9 @@ SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
            '-', '*', '/', '&', ',', '<', '>', '=', '~', '^', '#']
 INTEGERS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
+OPDICT = {'+':"ADD", '-':"SUB", "&":"AND", "|":"OR", "<":"LT", ">":"GT", "=":"EQ"}
+
+MATHDICT = {"*":"Math.multiply", "/":"Math.divide"}
 
 class CompilationEngine:
     """Gets input from a JackTokenizer and emits its parsed structure into an
@@ -257,11 +260,21 @@ class CompilationEngine:
     def compile_expression(self) -> None:
         """Compiles an expression."""
         # Your code goes here!
-        self.compile_term()
+        if self.tokenizer.cur_token in INTEGERS:
+            self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
+            self.tokenizer.advance()
+        # if self.tokenizer.cur_token in :
+        #     self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
         while self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
-            self.write_out()
-            self.compile_term()
-
+            op = self.tokenizer.cur_token
+            self.tokenizer.advance()
+            self.compile_expression()
+            if op in ['+', '-', "&", "|", "<", ">", "="]:
+                self.vm_writer.write_arithmetic(OPDICT[op])
+                self.tokenizer.advance()
+            else:
+                self.vm_writer.write_function(MATHDICT[op],2)
+                self.tokenizer.advance()
 
     def compile_term(self) -> None:
         """Compiles a term. 

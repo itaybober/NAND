@@ -81,7 +81,7 @@ class SymbolTable:
         for (var_name, var_type) in self.subroutine_table["VAR"]:
             if var_name == name:
                 return "VAR"
-        for (var_name, var_type) in self.subroutine_table["STATIC"]:
+        for (var_name, var_type) in self.class_table["STATIC"]:
             if var_name == name:
                 return "STATIC"
         return "FIELD"

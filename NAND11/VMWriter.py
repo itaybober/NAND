@@ -31,7 +31,7 @@ class VMWriter:
         """
         segment_dict = {"CONST": "constant", "ARG": "argument", "LOCAL": "local", "STATIC": "static"
                            , "THIS": "this", "THAT": "that", "POINTER": "pointer", "TEMP": "temp"}
-        self.output.write("push " + segment_dict[segment] + str(index) + "\n")
+        self.output.write("push " + segment_dict[segment] + " " + str(index) + "\n")
 
 
     def write_pop(self, segment: str, index: int) -> None:
@@ -55,7 +55,7 @@ class VMWriter:
         """
         # Your code goes here!
         if command in ["ADD", "SUB", "NEG", "EQ", "GT", "LT", "AND", "OR", "NOT"]:
-            self.output.write(command.lower())
+            self.output.write(command.lower() + "\n")
         else:
             raise ArithmeticError("no good my boy you did not handle dis")
 
@@ -66,7 +66,7 @@ class VMWriter:
         Args:
             label (str): the label to write.
         """
-        self.output.write("label " + label)
+        self.output.write("label " + label + "\n")
 
     def write_goto(self, label: str) -> None:
         """Writes a VM goto command.
@@ -74,7 +74,7 @@ class VMWriter:
         Args:
             label (str): the label to go to.
         """
-        self.output.write("goto " + label)
+        self.output.write("goto " + label + "\n")
 
     def write_if(self, label: str) -> None:
         """Writes a VM if-goto command.
@@ -82,7 +82,7 @@ class VMWriter:
         Args:
             label (str): the label to go to.
         """
-        self.output.write("if-goto " + label)
+        self.output.write("if-goto " + label + "\n")
 
     def write_call(self, name: str, n_args: int) -> None:
         """Writes a VM call command.
@@ -91,7 +91,7 @@ class VMWriter:
             name (str): the name of the function to call.
             n_args (int): the number of arguments the function receives.
         """
-        self.output.write("call " + name + " " + n_args)
+        self.output.write("call " + name + " " + str(n_args) + "\n")
 
     def write_function(self, name: str, n_locals: int) -> None:
         """Writes a VM function command.
@@ -100,7 +100,7 @@ class VMWriter:
             name (str): the name of the function.
             n_locals (int): the number of local variables the function uses.
         """
-        self.output.write("function " + name + " " + n_locals)
+        self.output.write("function " + name + " " + str(n_locals) + "\n")
 
     def write_return(self) -> None:
         """Writes a VM return command."""

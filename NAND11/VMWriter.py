@@ -29,7 +29,10 @@ class VMWriter:
             "LOCAL", "STATIC", "THIS", "THAT", "POINTER", "TEMP"
             index (int): the index to push to.
         """
-        self.output.write("push " + segment + str(index) + "\n")
+        segment_dict = {"CONST": "constant", "ARG": "argument", "LOCAL": "local", "STATIC": "static"
+                           , "THIS": "this", "THAT": "that", "POINTER": "pointer", "TEMP": "temp"}
+        self.output.write("push " + segment_dict[segment] + str(index) + "\n")
+
 
     def write_pop(self, segment: str, index: int) -> None:
         """Writes a VM pop command.

@@ -7,7 +7,9 @@ Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
 """
 import typing
 import JackTokenizer
-from NAND11.SymbolTable import SymbolTable
+from SymbolTable import SymbolTable
+from VMWriter import VMWriter
+
 
 NON_VALID_TYPE = ['class', 'constructor', 'function', 'method', 'field',
            'static', 'var','true',
@@ -53,6 +55,7 @@ class CompilationEngine:
         self.tokenizer = input_stream
         self.output = output_stream
         self.compile_class()
+        self.vm_writer = VMWriter()
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
@@ -226,12 +229,13 @@ class CompilationEngine:
 
     def compile_return(self) -> None:
         """Compiles a return statement."""
-        self.write_tabs("open","returnStatement")
         self.eat("return")
         if self.tokenizer.cur_token != ";":
             self.compile_expression()
+        else:
+            self.vm_writer.write_push('CONST', 0)
+        self.vm_writer.write_return()
         self.eat(";")
-        self.write_tabs("close","returnStatement")
 
     def compile_if(self) -> None:
         """Compiles a if statement, possibly with a trailing else clause."""
@@ -253,12 +257,11 @@ class CompilationEngine:
     def compile_expression(self) -> None:
         """Compiles an expression."""
         # Your code goes here!
-        self.write_tabs("open", "expression")
         self.compile_term()
         while self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
             self.write_out()
             self.compile_term()
-        self.write_tabs("close", "expression")
+
 
     def compile_term(self) -> None:
         """Compiles a term. 
@@ -330,7 +333,7 @@ class CompilationEngine:
         if type == "KEYWORD":
             value = self.tokenizer.keyword()
 
-        self.output.write("<" + self.dict[type] + "> " + str(value) + " </" + self.dict[type] + ">\n")
+        # self.output.write("<" + self.dict[type] + "> " + str(value) + " </" + self.dict[type] + ">\n")
         self.tokenizer.advance()
 
     def write_tabs(self, state=None, token=None):

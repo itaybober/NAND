@@ -54,17 +54,18 @@ class CompilationEngine:
         # Your code goes here!
         # Note that you can write to output_stream like so:
         # output_stream.write("Hello world! \n")
+        self.class_name = None
         self.symtable = None
         self.tokenizer = input_stream
         self.output = output_stream
         self.compile_class()
+        self.symtable = SymbolTable()
         self.vm_writer = VMWriter()
 
     def compile_class(self) -> None:
         """Compiles a complete class."""
-        self.write_tabs("open", "class")
-        self.symtable = SymbolTable()
         self.eat("class")
+        self.class_name = self.tokenizer.cur_token
         self.is_valid_type()
         self.eat("{")
         while self.tokenizer.cur_token in ["static", "field"]:
@@ -72,7 +73,6 @@ class CompilationEngine:
         while self.tokenizer.cur_token in ["constructor", "function", "method"]:
             self.compile_subroutine()
         self.eat("}")
-        self.write_tabs("close", "class")
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
@@ -116,14 +116,19 @@ class CompilationEngine:
             self.eat("method")
         else:
             self.eat(1)
+
         if self.tokenizer.cur_token == "void":
             self.eat("void")
         else:
             self.is_valid_type()
+
+        func_name = self.class_name + "." + self.tokenizer.cur_token
+
         self.is_valid_name()
         self.eat("(")
-        self.compile_parameter_list()
+        count = self.compile_parameter_list()
         self.eat(")")
+        self.vm_writer.write_function(func_name, count)
         self.compile_subroutine_body()
         print(self.symtable)
         self.write_tabs("close", "subroutineDec")
@@ -131,13 +136,14 @@ class CompilationEngine:
 
 
 
-    def compile_parameter_list(self) -> None:
+    def compile_parameter_list(self) -> int:
         """Compiles a (possibly empty) parameter list, not including the 
         enclosing "()".
         """
 
-        self.write_tabs("open", "parameterList")
+        param_count = 0
         if self.tokenizer.cur_token != ")":
+            param_count += 1
             kind = "ARG"
             name_type_list = []
             var_type1 = self.tokenizer.cur_token
@@ -147,6 +153,7 @@ class CompilationEngine:
             name_type_list.append((name1, var_type1))
 
             while self.tokenizer.cur_token == ",":
+                param_count += 1
                 self.eat(",")
                 var_type = self.tokenizer.cur_token
                 self.is_valid_type()
@@ -156,8 +163,7 @@ class CompilationEngine:
 
             for (name, var_type) in name_type_list:
                 self.symtable.define(name, var_type, kind)
-
-        self.write_tabs("close", "parameterList")
+        return param_count
 
     def compile_var_dec(self) -> None:
         """Compiles a var declaration."""
@@ -198,11 +204,9 @@ class CompilationEngine:
 
     def compile_do(self) -> None:
         """Compiles a do statement."""
-        self.write_tabs("open", "doStatement")
-        self.eat("do")
+
         self.compile_subroutine_call()
         self.eat(";")
-        self.write_tabs("close", "doStatement")
 
     def compile_let(self) -> None:
         """Compiles a let statement."""

@@ -257,26 +257,6 @@ class CompilationEngine:
             self.eat("}")
         self.write_tabs("close","ifStatement")
 
-    # def compile_expression(self) -> None:
-    #     """Compiles an expression."""
-    #     # Your code goes here!
-    #     if self.tokenizer.cur_token in INTEGERS:
-    #         self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
-    #         self.tokenizer.advance()
-    #     while self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
-    #         op = self.tokenizer.cur_token
-    #         self.tokenizer.advance()
-    #         if self.tokenizer.cur_token == "(":
-    #             self.eat("(")
-    #             self.compile_expression()
-    #             self.eat(")")  #TODO definitely wrong
-    #         self.compile_expression()
-    #         if op in ['+', '-', "&", "|", "<", ">", "="]:
-    #             self.vm_writer.write_arithmetic(OPDICT[op])
-    #             self.tokenizer.advance()
-    #         else:
-    #             self.vm_writer.write_call(MATHDICT[op],2)
-    #             self.tokenizer.advance()
 
     def compile_expression(self) -> None:
         """Compiles an expression."""

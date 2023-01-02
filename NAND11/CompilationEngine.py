@@ -32,6 +32,7 @@ SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
 INTEGERS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 OPDICT = {'+':"ADD", '-':"SUB", "&":"AND", "|":"OR", "<":"LT", ">":"GT", "=":"EQ"}
+PREOPDICT = {'-':"NEG","~":"NOT"}
 
 MATHDICT = {"*":"Math.multiply", "/":"Math.divide"}
 
@@ -164,7 +165,7 @@ class CompilationEngine:
 
     def compile_var_dec(self) -> None:
         """Compiles a var declaration."""
-        self.write_tabs("open", "varDec")
+        # self.write_tabs("open", "varDec")
         kind = "VAR"
         self.eat("var")
         var_type = self.tokenizer.cur_token
@@ -179,7 +180,7 @@ class CompilationEngine:
         self.eat(";")
         for name in names:
             self.symtable.define(name, var_type, kind)
-        self.write_tabs("close", "varDec")
+        # self.write_tabs("close", "varDec")
 
     def compile_statements(self) -> None:
         """Compiles a sequence of statements, not including the enclosing 
@@ -208,6 +209,7 @@ class CompilationEngine:
         """Compiles a let statement."""
         self.write_tabs("open", "letStatement")
         self.eat("let")
+        var_name = self.tokenizer.cur_token
         self.is_valid_name()
         if self.tokenizer.cur_token == "[":
             self.eat("[")
@@ -260,28 +262,26 @@ class CompilationEngine:
 
     def compile_expression(self) -> None:
         """Compiles an expression."""
-        # Your code goes here!
-        exp_count = 0
-        if self.tokenizer.cur_token == "(":
-            exp_count += 1
+        if self.tokenizer.cur_token in ["-","~"]:
+            self.vm_writer.write_arithmetic(PREOPDICT[self.tokenizer.cur_token])
             self.tokenizer.advance()
         if self.tokenizer.cur_token in INTEGERS:
             self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
             self.tokenizer.advance()
-        if self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
+        # if self.tokenizer.cur_token in self.symtable:
+        #     push the var
+        while self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
             op = self.tokenizer.cur_token
             self.tokenizer.advance()
             self.compile_expression()
+            if self.tokenizer.cur_token == "(":
+                self.eat("(")
+                self.compile_expression()
+                self.eat(")")
             if op in ['+', '-', "&", "|", "<", ">", "="]:
                 self.vm_writer.write_arithmetic(OPDICT[op])
-                while exp_count != 0:
-                    self.tokenizer.advance()
-                    exp_count -= 1
             else:
                 self.vm_writer.write_call(MATHDICT[op], 2)
-                while exp_count != 0:
-                    self.tokenizer.advance()
-                    exp_count -= 1
 
 
     def compile_term(self) -> None:

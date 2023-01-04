@@ -231,15 +231,22 @@ class CompilationEngine:
 
     def compile_while(self) -> None:
         """Compiles a while statement."""
-        self.write_tabs("open","whileStatement")
+        # self.write_tabs("open","whileStatement")
         self.eat('while')
+        label1 = self.generate_label()
+        self.vm_writer.write_label(label1)
         self.eat("(")
         self.compile_expression()
         self.eat(")")
+        self.vm_writer.write_arithmetic("NOT")
+        label2 = self.generate_label()
+        self.vm_writer.write_if(label2)
         self.eat("{")
         self.compile_statements()
         self.eat("}")
-        self.write_tabs("close","whileStatement")
+        self.vm_writer.write_goto(label1)
+        self.vm_writer.write_label(label2)
+        # self.write_tabs("close","whileStatement")
 
     def compile_return(self) -> None:
         """Compiles a return statement."""
@@ -433,4 +440,4 @@ class CompilationEngine:
 
     def generate_label(self):
         self.label_count += 1
-        return "label " + str(self.label_count)
+        return "label" + str(self.label_count)

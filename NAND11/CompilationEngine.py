@@ -289,7 +289,7 @@ class CompilationEngine:
             else:
                 self.vm_writer.write_call(MATHDICT[op], 2)
             # if it's a function
-        if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in ['+', '-', '*', "/", "&", "|", "<", ">", "=", "~"]:
+        if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in ['+', '-', '*', "/", "&", "|", "<", ">", "=", "~", "(", ")"]:
             self.compile_subroutine_call()
 
 

@@ -111,13 +111,14 @@ class CompilationEngine:
         you will understand why this is necessary in project 11.
         """
         self.symtable.start_subroutine()
-        self.symtable.define("this", self.class_name, "ARG")
+
         if self.tokenizer.cur_token == "constructor":
             self.eat("constructor")
         elif self.tokenizer.cur_token == "function":
             self.eat("function")
         elif self.tokenizer.cur_token == "method":
             self.eat("method")
+            self.symtable.define("this", self.class_name, "ARG")
         else:
             self.eat(1)
 
@@ -225,7 +226,6 @@ class CompilationEngine:
         self.eat("=")
         self.compile_expression()
         self.vm_writer.write_pop(KINDDICT[var_kind], var_index)
-        self.vm_writer.write_push(KINDDICT[var_kind], var_index)
         self.eat(";")
         # self.write_tabs("close", "letStatement")
 
@@ -234,12 +234,12 @@ class CompilationEngine:
         # self.write_tabs("open","whileStatement")
         self.eat('while')
         label1 = self.generate_label()
+        label2 = self.generate_label()
         self.vm_writer.write_label(label1)
         self.eat("(")
         self.compile_expression()
-        self.eat(")")
         self.vm_writer.write_arithmetic("NOT")
-        label2 = self.generate_label()
+        self.eat(")")
         self.vm_writer.write_if(label2)
         self.eat("{")
         self.compile_statements()

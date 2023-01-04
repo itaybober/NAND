@@ -271,9 +271,13 @@ class CompilationEngine:
         if self.tokenizer.cur_token in ["-", "~"]:
             self.vm_writer.write_arithmetic(PREOPDICT[self.tokenizer.cur_token])
             self.tokenizer.advance()
-        if self.tokenizer.cur_token in INTEGERS:
+        if self.tokenizer.cur_token[0] in INTEGERS:
             self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
             self.tokenizer.advance()
+        # if it's a function
+        if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in SYMBOLS:
+            self.compile_subroutine_call()
+
         # if self.tokenizer.cur_token in self.symtable:
         #     push the var
         while self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
@@ -288,9 +292,7 @@ class CompilationEngine:
                 self.vm_writer.write_arithmetic(OPDICT[op])
             else:
                 self.vm_writer.write_call(MATHDICT[op], 2)
-            # if it's a function
-        if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in ['+', '-', '*', "/", "&", "|", "<", ">", "=", "~", "(", ")"]:
-            self.compile_subroutine_call()
+
 
 
 

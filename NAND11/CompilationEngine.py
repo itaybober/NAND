@@ -60,7 +60,10 @@ class CompilationEngine:
         self.tokenizer = input_stream
         self.output = output_stream
         self.vm_writer = VMWriter(output_stream)
+        self.class_name = None
         self.compile_class()
+        self.label_count = 0
+
 
 
     def compile_class(self) -> None:
@@ -108,6 +111,7 @@ class CompilationEngine:
         you will understand why this is necessary in project 11.
         """
         self.symtable.start_subroutine()
+        self.symtable.define("this", self.class_name, "ARG")
         if self.tokenizer.cur_token == "constructor":
             self.eat("constructor")
         elif self.tokenizer.cur_token == "function":
@@ -249,7 +253,7 @@ class CompilationEngine:
 
     def compile_if(self) -> None:
         """Compiles a if statement, possibly with a trailing else clause."""
-        self.write_tabs("open","ifStatement")
+        # self.write_tabs("open","ifStatement")
         self.eat("if")
         self.eat("(")
         self.compile_expression()
@@ -262,7 +266,7 @@ class CompilationEngine:
             self.eat("{")
             self.compile_statements()
             self.eat("}")
-        self.write_tabs("close","ifStatement")
+        # self.write_tabs("close","ifStatement")
 
 
     def compile_expression(self) -> None:
@@ -286,6 +290,7 @@ class CompilationEngine:
                 kind = KINDDICT[self.symtable.kind_of(self.tokenizer.cur_token)]
                 index = self.symtable.index_of(self.tokenizer.cur_token)
                 self.vm_writer.write_push(kind, index)
+                self.tokenizer.advance()
 
         # if self.tokenizer.cur_token in self.symtable:
         #     push the var
@@ -424,3 +429,8 @@ class CompilationEngine:
         call_var_num = self.compile_expression_list()
         self.eat(")")
         self.vm_writer.write_call(function_name, call_var_num)
+
+
+    def generate_label(self):
+        self.label_count += 1
+        return "label " + str(self.label_count)

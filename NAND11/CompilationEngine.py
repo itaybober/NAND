@@ -203,7 +203,7 @@ class CompilationEngine:
         """Compiles a do statement."""
         self.eat("do")
         self.compile_subroutine_call()
-        self.vm_writer.write_pop("temp", 0)
+        self.vm_writer.write_pop("TEMP", 0)
         self.eat(";")
 
     def compile_let(self) -> None:

@@ -33,6 +33,7 @@ INTEGERS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 OPDICT = {'+':"ADD", '-':"SUB", "&":"AND", "|":"OR", "<":"LT", ">":"GT", "=":"EQ"}
 PREOPDICT = {'-':"NEG","~":"NOT"}
+KINDDICT = {"VAR":"LOCAL", "ARG":"ARG", "STATIC":"STATIC", "FIELD":"FIELD"}
 
 MATHDICT = {"*":"Math.multiply", "/":"Math.divide"}
 
@@ -202,23 +203,27 @@ class CompilationEngine:
         """Compiles a do statement."""
         self.eat("do")
         self.compile_subroutine_call()
-        self.vm_writer.write_pop("temp",0)
+        self.vm_writer.write_pop("temp", 0)
         self.eat(";")
 
     def compile_let(self) -> None:
         """Compiles a let statement."""
-        self.write_tabs("open", "letStatement")
+        # self.write_tabs("open", "letStatement")
         self.eat("let")
         var_name = self.tokenizer.cur_token
         self.is_valid_name()
+        var_kind = self.symtable.kind_of(var_name)
+        var_index = self.symtable.index_of(var_name)
         if self.tokenizer.cur_token == "[":
             self.eat("[")
             self.compile_expression()
             self.eat("]")
         self.eat("=")
         self.compile_expression()
+        self.vm_writer.write_pop(KINDDICT[var_kind], var_index)
+        self.vm_writer.write_push(KINDDICT[var_kind], var_index)
         self.eat(";")
-        self.write_tabs("close", "letStatement")
+        # self.write_tabs("close", "letStatement")
 
     def compile_while(self) -> None:
         """Compiles a while statement."""

@@ -261,18 +261,25 @@ class CompilationEngine:
     def compile_if(self) -> None:
         """Compiles a if statement, possibly with a trailing else clause."""
         # self.write_tabs("open","ifStatement")
+        label1 = self.generate_label()
+        label2 = self.generate_label()
         self.eat("if")
         self.eat("(")
         self.compile_expression()
+        self.vm_writer.write_arithmetic("NEG")
         self.eat(")")
+        self.vm_writer.write_if(label1)
         self.eat("{")
         self.compile_statements()
         self.eat("}")
+        self.vm_writer.write_goto(label2)
+        self.vm_writer.write_label(label1)
         if self.tokenizer.cur_token == "else":
             self.eat("else")
             self.eat("{")
             self.compile_statements()
             self.eat("}")
+        self.vm_writer.write_label(label2)
         # self.write_tabs("close","ifStatement")
 
 

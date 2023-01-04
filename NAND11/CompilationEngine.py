@@ -56,13 +56,13 @@ class CompilationEngine:
         # Your code goes here!
         # Note that you can write to output_stream like so:
         # output_stream.write("Hello world! \n")
+        self.label_count = 0
         self.symtable = SymbolTable()
         self.tokenizer = input_stream
         self.output = output_stream
         self.vm_writer = VMWriter(output_stream)
         self.class_name = None
         self.compile_class()
-        self.label_count = 0
 
 
 
@@ -285,17 +285,32 @@ class CompilationEngine:
 
     def compile_expression(self) -> None:
         """Compiles an expression."""
+        if self.tokenizer.cur_token == "(":
+            self.eat("(")
+            self.compile_expression()
+            self.eat(")")
 
         if self.tokenizer.cur_token in ["-", "~"]:
             op = self.tokenizer.cur_token
             self.tokenizer.advance()
-            self.compile_expression()
+            if self.tokenizer.cur_token == "(":
+                self.eat("(")
+                self.compile_expression()
+                self.eat(")")
+            else:
+                self.compile_expression()
             self.vm_writer.write_arithmetic(PREOPDICT[op])
 
         if self.tokenizer.cur_token[0] in INTEGERS:
             self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
             self.tokenizer.advance()
-
+        if self.tokenizer.cur_token in ["true","false"]:
+            if self.tokenizer.cur_token == "true":
+                self.vm_writer.write_push("CONST", 1)
+                self.vm_writer.write_arithmetic("NEG")
+            else:
+                self.vm_writer.write_push("CONST", 0)
+            self.tokenizer.advance()
         # if it's a function
         if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in SYMBOLS:
             if self.symtable.type_of(self.tokenizer.cur_token) is None:

@@ -400,7 +400,10 @@ class CompilationEngine:
         self.write_out()
 
     def compile_subroutine_call(self):
-        function_name = self.tokenizer.cur_token
+        if self.symtable.type_of(self.tokenizer.cur_token) == None:
+            function_name = self.tokenizer.cur_token
+        else:
+            function_name = self.symtable.type_of(self.tokenizer.cur_token)
         kind = self.symtable.kind_of(self.tokenizer.cur_token)
         self.tokenizer.advance()
         if self.tokenizer.cur_token == ".":

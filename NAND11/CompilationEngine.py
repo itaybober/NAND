@@ -262,7 +262,8 @@ class CompilationEngine:
 
     def compile_expression(self) -> None:
         """Compiles an expression."""
-        if self.tokenizer.cur_token in ["-","~"]:
+
+        if self.tokenizer.cur_token in ["-", "~"]:
             self.vm_writer.write_arithmetic(PREOPDICT[self.tokenizer.cur_token])
             self.tokenizer.advance()
         if self.tokenizer.cur_token in INTEGERS:
@@ -282,6 +283,10 @@ class CompilationEngine:
                 self.vm_writer.write_arithmetic(OPDICT[op])
             else:
                 self.vm_writer.write_call(MATHDICT[op], 2)
+            # if it's a function
+        if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in ['+', '-', '*', "/", "&", "|", "<", ">", "=", "~"]:
+            self.compile_subroutine_call()
+
 
 
     def compile_term(self) -> None:

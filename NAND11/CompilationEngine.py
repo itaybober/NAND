@@ -269,14 +269,23 @@ class CompilationEngine:
         """Compiles an expression."""
 
         if self.tokenizer.cur_token in ["-", "~"]:
-            self.vm_writer.write_arithmetic(PREOPDICT[self.tokenizer.cur_token])
+            op = self.tokenizer.cur_token
             self.tokenizer.advance()
+            self.compile_expression()
+            self.vm_writer.write_arithmetic(PREOPDICT[op])
+
         if self.tokenizer.cur_token[0] in INTEGERS:
             self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
             self.tokenizer.advance()
+
         # if it's a function
         if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in SYMBOLS:
-            self.compile_subroutine_call()
+            if self.symtable.kind_of(self.tokenizer.cur_token) is None:
+                self.compile_subroutine_call()
+            else:
+                kind = KINDDICT[self.symtable.kind_of(self.tokenizer.cur_token)]
+                index = self.symtable.index_of(self.tokenizer.cur_token)
+                self.vm_writer.write_push(kind, index)
 
         # if self.tokenizer.cur_token in self.symtable:
         #     push the var

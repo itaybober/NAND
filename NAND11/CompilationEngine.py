@@ -280,7 +280,7 @@ class CompilationEngine:
 
         # if it's a function
         if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in SYMBOLS:
-            if self.symtable.kind_of(self.tokenizer.cur_token) is None:
+            if self.symtable.type_of(self.tokenizer.cur_token) is None:
                 self.compile_subroutine_call()
             else:
                 kind = KINDDICT[self.symtable.kind_of(self.tokenizer.cur_token)]

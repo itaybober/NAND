@@ -32,8 +32,10 @@ SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+',
 INTEGERS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 OPDICT = {'+':"ADD", '-':"SUB", "&":"AND", "|":"OR", "<":"LT", ">":"GT", "=":"EQ"}
+
 PREOPDICT = {'-':"NEG","~":"NOT"}
-KINDDICT = {"VAR":"LOCAL", "ARG":"ARG", "STATIC":"STATIC", "FIELD":"FIELD"}
+
+KINDDICT = {"VAR": "LOCAL", "ARG":"ARG", "STATIC":"STATIC", "FIELD":"THIS"}
 
 MATHDICT = {"*":"Math.multiply", "/":"Math.divide"}
 
@@ -80,7 +82,7 @@ class CompilationEngine:
 
     def compile_class_var_dec(self) -> None:
         """Compiles a static declaration or a field declaration."""
-        self.write_tabs("open", "classVarDec")
+        # self.write_tabs("open", "classVarDec")
         if self.tokenizer.cur_token == "static":
             self.eat("static")
             kind = "STATIC"
@@ -102,7 +104,7 @@ class CompilationEngine:
         for name in names:
             self.symtable.define(name, var_type, kind)
         print(self.symtable)
-        self.write_tabs("close", "classVarDec")
+        # self.write_tabs("close", "classVarDec")
 
     def compile_subroutine(self) -> None:
         """
@@ -111,14 +113,16 @@ class CompilationEngine:
         you will understand why this is necessary in project 11.
         """
         self.symtable.start_subroutine()
-
+        call = False
         if self.tokenizer.cur_token == "constructor":
             self.eat("constructor")
+            call = "is_constructor"
         elif self.tokenizer.cur_token == "function":
             self.eat("function")
         elif self.tokenizer.cur_token == "method":
             self.eat("method")
             self.symtable.define("this", self.class_name, "ARG")
+            call = "is_method"
         else:
             self.eat(1)
 
@@ -133,7 +137,7 @@ class CompilationEngine:
         self.eat("(")
         self.compile_parameter_list()
         self.eat(")")
-        self.compile_subroutine_body(func_name)
+        self.compile_subroutine_body(func_name, call)
         print(self.symtable)
 
 
@@ -253,7 +257,10 @@ class CompilationEngine:
     def compile_return(self) -> None:
         """Compiles a return statement."""
         self.eat("return")
-        if self.tokenizer.cur_token != ";":
+        if self.tokenizer.cur_token == "this":
+            self.vm_writer.write_push("POINTER", 0)
+            self.eat("this")
+        elif self.tokenizer.cur_token != ";":
             self.compile_expression()
         else:
             self.vm_writer.write_push('CONST', 0)
@@ -287,11 +294,6 @@ class CompilationEngine:
 
     def compile_expression(self) -> None:
         """Compiles an expression."""
-        if self.tokenizer.cur_token == "(":
-            self.eat("(")
-            self.compile_expression()
-            self.eat(")")
-
         if self.tokenizer.cur_token in ["-", "~"]:
             op = self.tokenizer.cur_token
             self.tokenizer.advance()
@@ -302,6 +304,13 @@ class CompilationEngine:
             else:
                 self.compile_expression()
             self.vm_writer.write_arithmetic(PREOPDICT[op])
+
+        if self.tokenizer.cur_token == "(":
+            self.eat("(")
+            self.compile_expression()
+            self.eat(")")
+
+
 
         if self.tokenizer.cur_token[0] in INTEGERS:
             self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
@@ -425,12 +434,19 @@ class CompilationEngine:
         else:
             self.output.write("  " * self.tabs)
 
-    def compile_subroutine_body(self, func_name):
+    def compile_subroutine_body(self, func_name, call):
         self.eat("{")
         count = 0
         while self.tokenizer.cur_token == "var":
             count += self.compile_var_dec()
         self.vm_writer.write_function(func_name, count)
+        if call == "is_constructor":
+            self.vm_writer.write_push("CONST", self.symtable.var_count("FIELD"))
+            self.vm_writer.write_call("Memory.alloc", 1)
+            self.vm_writer.write_pop("POINTER", 0)
+        if call == "is_method":
+            self.vm_writer.write_push("ARG", 0)
+            self.vm_writer.write_pop("POINTER", 0)
         self.compile_statements()
         self.eat("}")
         return count
@@ -448,21 +464,28 @@ class CompilationEngine:
         self.write_out()
 
     def compile_subroutine_call(self):
+        is_method = 0
         if self.symtable.type_of(self.tokenizer.cur_token) == None:
             function_name = self.tokenizer.cur_token
+            self.tokenizer.advance()
+            if self.tokenizer.cur_token != ".":
+                self.vm_writer.write_push("POINTER", 0)
+                function_name = self.class_name + "." + function_name
+                is_method = 1
         else:
+            obj = self.tokenizer.cur_token
+            self.vm_writer.write_push(KINDDICT[self.symtable.kind_of(obj)], self.symtable.index_of(obj))
             function_name = self.symtable.type_of(self.tokenizer.cur_token)
-        kind = self.symtable.kind_of(self.tokenizer.cur_token)
-        self.tokenizer.advance()
+            is_method = 1
+            self.tokenizer.advance()
         if self.tokenizer.cur_token == ".":
             self.eat(".")
             function_name += "." + self.tokenizer.cur_token
             self.is_valid_name()
-            kind = self.symtable.kind_of(self.tokenizer.cur_token)
         self.eat("(")
         call_var_num = self.compile_expression_list()
         self.eat(")")
-        self.vm_writer.write_call(function_name, call_var_num)
+        self.vm_writer.write_call(function_name, call_var_num + is_method)
 
 
     def generate_label(self):

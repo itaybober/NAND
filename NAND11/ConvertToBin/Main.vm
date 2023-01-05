@@ -1,4 +1,4 @@
-function Main.main 0
+function Main.main 1
 push constant 8001
 push constant 16
 push constant 1
@@ -13,7 +13,7 @@ call Main.convert 1
 pop temp 0
 push constant 0
 return
-function Main.convert 1
+function Main.convert 3
 push constant 1
 neg
 pop local 2
@@ -32,15 +32,15 @@ push local 1
 push constant 16
 gt
 not
-neg
+not
 if-goto label3
-push argument 1
+push argument 0
 push local 0
 and
 push constant 0
 eq
 not
-neg
+not
 if-goto label5
 push constant 8000
 push local 1
@@ -66,40 +66,40 @@ goto label1
 label label2
 push constant 0
 return
-function Main.nextMask 1
-push argument 1
+function Main.nextMask 0
+push argument 0
 push constant 0
 eq
-neg
+not
 if-goto label7
 push constant 1
 return
 goto label8
 label label7
-push argument 1
+push argument 0
 push constant 2
 call Math.multiply 2
 return
 label label8
-function Main.fillMemory 3
+function Main.fillMemory 0
 label label9
-push argument 2
+push argument 1
 push constant 0
 gt
 not
 if-goto label10
-push argument 1
-push argument 3
+push argument 0
+push argument 2
 call Memory.poke 2
 pop temp 0
-push argument 2
-push constant 1
-sub
-pop argument 2
 push argument 1
 push constant 1
-add
+sub
 pop argument 1
+push argument 0
+push constant 1
+add
+pop argument 0
 goto label9
 label label10
 push constant 0

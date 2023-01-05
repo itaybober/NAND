@@ -131,10 +131,9 @@ class CompilationEngine:
 
         self.is_valid_name()
         self.eat("(")
-        count = self.compile_parameter_list()
+        self.compile_parameter_list()
         self.eat(")")
-        self.vm_writer.write_function(func_name, count)
-        self.compile_subroutine_body()
+        self.compile_subroutine_body(func_name)
         print(self.symtable)
 
 
@@ -169,23 +168,26 @@ class CompilationEngine:
                 self.symtable.define(name, var_type, kind)
         return param_count
 
-    def compile_var_dec(self) -> None:
+    def compile_var_dec(self) -> int:
         """Compiles a var declaration."""
         # self.write_tabs("open", "varDec")
         kind = "VAR"
         self.eat("var")
+        count = 1
         var_type = self.tokenizer.cur_token
         self.is_valid_type()
         names = []
         names.append(self.tokenizer.cur_token)
         self.is_valid_name()
         while self.tokenizer.cur_token == ",":
+            count += 1
             self.eat(",")
             names.append(self.tokenizer.cur_token)
             self.is_valid_name()
         self.eat(";")
         for name in names:
             self.symtable.define(name, var_type, kind)
+        return count
         # self.write_tabs("close", "varDec")
 
     def compile_statements(self) -> None:
@@ -266,7 +268,7 @@ class CompilationEngine:
         self.eat("if")
         self.eat("(")
         self.compile_expression()
-        self.vm_writer.write_arithmetic("NEG")
+        self.vm_writer.write_arithmetic("NOT")
         self.eat(")")
         self.vm_writer.write_if(label1)
         self.eat("{")
@@ -423,12 +425,15 @@ class CompilationEngine:
         else:
             self.output.write("  " * self.tabs)
 
-    def compile_subroutine_body(self):
+    def compile_subroutine_body(self, func_name):
         self.eat("{")
+        count = 0
         while self.tokenizer.cur_token == "var":
-            self.compile_var_dec()
+            count += self.compile_var_dec()
+        self.vm_writer.write_function(func_name, count)
         self.compile_statements()
         self.eat("}")
+        return count
 
     def is_valid_type(self):
         if self.tokenizer.cur_token in NON_VALID_TYPE:

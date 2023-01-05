@@ -226,13 +226,19 @@ class CompilationEngine:
         var_kind = self.symtable.kind_of(var_name)
         var_index = self.symtable.index_of(var_name)
         if self.tokenizer.cur_token == "[":
+            self.vm_writer.write_push(KINDDICT[var_kind], var_index)
             self.eat("[")
             self.compile_expression()
             self.eat("]")
-        self.eat("=")
-        self.compile_expression()
-        self.vm_writer.write_pop(KINDDICT[var_kind], var_index)
-        self.eat(";")
+            self.vm_writer.write_arithmetic("ADD")
+            self.eat("=")
+            self.compile_expression()
+            self.eat(";")
+        else:
+            self.eat("=")
+            self.compile_expression()
+            self.vm_writer.write_pop(KINDDICT[var_kind], var_index)
+            self.eat(";")
         # self.write_tabs("close", "letStatement")
 
     def compile_while(self) -> None:
@@ -315,6 +321,7 @@ class CompilationEngine:
         if self.tokenizer.cur_token[0] in INTEGERS:
             self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
             self.tokenizer.advance()
+
         if self.tokenizer.cur_token in ["true","false"]:
             if self.tokenizer.cur_token == "true":
                 self.vm_writer.write_push("CONST", 1)
@@ -327,13 +334,26 @@ class CompilationEngine:
             if self.symtable.type_of(self.tokenizer.cur_token) is None:
                 self.compile_subroutine_call()
             else:
-                kind = KINDDICT[self.symtable.kind_of(self.tokenizer.cur_token)]
-                index = self.symtable.index_of(self.tokenizer.cur_token)
-                self.vm_writer.write_push(kind, index)
+                var_name = self.tokenizer.cur_token
+                var_kind = self.symtable.kind_of(var_name)
+                var_index = self.symtable.index_of(var_name)
                 self.tokenizer.advance()
+                if self.tokenizer.cur_token == "[":
+                    self.eat("[")
+                    self.vm_writer.write_push(KINDDICT[var_kind], var_index)
+                    self.compile_expression()
+                    self.vm_writer.write_arithmetic("ADD")
+                    self.vm_writer.write_pop("TEMP", 0)
+                    self.vm_writer.write_pop("POINTER", 1)
+                    self.vm_writer.write_push("TEMP", 0)
+                    self.vm_writer.write_pop("THAT", 0)
+                    self.eat("]")
+                else:
+                    kind = KINDDICT[self.symtable.kind_of(var_name)]
+                    index = self.symtable.index_of(var_name)
+                    self.vm_writer.write_push(kind, index)
+                    self.tokenizer.advance()
 
-        # if self.tokenizer.cur_token in self.symtable:
-        #     push the var
         while self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
             op = self.tokenizer.cur_token
             self.tokenizer.advance()

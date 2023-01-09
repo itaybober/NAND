@@ -308,6 +308,10 @@ class CompilationEngine:
 
     def compile_expression(self) -> None:
         """Compiles an expression."""
+        if self.tokenizer.cur_token == "null":
+            self.vm_writer.write_push("CONST", 0)
+            self.tokenizer.advance()
+
         if self.tokenizer.cur_token in ["-", "~"]:
             op = self.tokenizer.cur_token
             self.tokenizer.advance()

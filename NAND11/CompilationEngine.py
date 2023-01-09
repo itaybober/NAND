@@ -239,7 +239,7 @@ class CompilationEngine:
             self.vm_writer.write_pop("TEMP", 0)
             self.vm_writer.write_pop("POINTER", 1)
             self.vm_writer.write_push("TEMP", 0)
-            self.vm_writer.write_push("THAT", 0)
+            self.vm_writer.write_pop("THAT", 0)
 
 
         else:
@@ -333,6 +333,16 @@ class CompilationEngine:
                 self.vm_writer.write_push("CONST", 0)
             self.tokenizer.advance()
 
+        # if it's a string
+        if self.tokenizer.cur_token[0] == '\"':
+            phrase = self.tokenizer.cur_token[1:-1]
+            self.vm_writer.write_push("CONST", len(phrase))
+            self.vm_writer.write_call("String.new", 1)
+            for letter in phrase:
+                self.vm_writer.write_push("CONST", ord(letter))
+                self.vm_writer.write_call("String.appendChar", 2)
+            self.tokenizer.advance()
+
         # if it's a function
         if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in SYMBOLS:
             if self.symtable.type_of(self.tokenizer.cur_token) is None:
@@ -356,7 +366,7 @@ class CompilationEngine:
                     kind = KINDDICT[self.symtable.kind_of(var_name)]
                     index = self.symtable.index_of(var_name)
                     self.vm_writer.write_push(kind, index)
-                    self.tokenizer.advance()
+                    # self.tokenizer.advance()
 
         while self.tokenizer.cur_token in ['+', '-', '*', "/", "&", "|", "<", ">", "="]:
             op = self.tokenizer.cur_token

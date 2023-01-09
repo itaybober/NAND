@@ -325,7 +325,7 @@ class CompilationEngine:
             self.vm_writer.write_push("CONST", int(self.tokenizer.cur_token))
             self.tokenizer.advance()
 
-        if self.tokenizer.cur_token in ["true","false"]:
+        if self.tokenizer.cur_token in ["true", "false"]:
             if self.tokenizer.cur_token == "true":
                 self.vm_writer.write_push("CONST", 1)
                 self.vm_writer.write_arithmetic("NEG")
@@ -362,6 +362,15 @@ class CompilationEngine:
                     # self.vm_writer.write_push("TEMP", 0)
                     self.vm_writer.write_push("THAT", 0)
                     self.eat("]")
+                elif self.tokenizer.cur_token == ".":
+                    self.eat(".")
+                    self.vm_writer.write_push(KINDDICT[self.symtable.kind_of(var_name)],var_index)
+                    function_name = var_kind + "." + self.tokenizer.cur_token
+                    self.tokenizer.advance()
+                    self.eat("(")
+                    call_var_num = self.compile_expression_list()
+                    self.eat(")")
+                    self.vm_writer.write_call(function_name, call_var_num+1)
                 else:
                     kind = KINDDICT[self.symtable.kind_of(var_name)]
                     index = self.symtable.index_of(var_name)

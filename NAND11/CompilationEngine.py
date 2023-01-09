@@ -351,6 +351,7 @@ class CompilationEngine:
                 var_name = self.tokenizer.cur_token
                 var_kind = self.symtable.kind_of(var_name)
                 var_index = self.symtable.index_of(var_name)
+                var_type = self.symtable.type_of(var_name)
                 self.tokenizer.advance()
                 if self.tokenizer.cur_token == "[":
                     self.eat("[")
@@ -365,7 +366,7 @@ class CompilationEngine:
                 elif self.tokenizer.cur_token == ".":
                     self.eat(".")
                     self.vm_writer.write_push(KINDDICT[self.symtable.kind_of(var_name)],var_index)
-                    function_name = var_kind + "." + self.tokenizer.cur_token
+                    function_name = var_type + "." + self.tokenizer.cur_token
                     self.tokenizer.advance()
                     self.eat("(")
                     call_var_num = self.compile_expression_list()

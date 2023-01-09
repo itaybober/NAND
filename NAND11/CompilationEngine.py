@@ -311,6 +311,7 @@ class CompilationEngine:
                 self.compile_expression()
             self.vm_writer.write_arithmetic(PREOPDICT[op])
 
+
         if self.tokenizer.cur_token == "(":
             self.eat("(")
             self.compile_expression()

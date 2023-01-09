@@ -73,7 +73,7 @@ push constant 510
 lt
 and
 not
-if-goto label2
+if-goto IF_FALSE0
 push pointer 0
 call Square.erase 1
 pop temp 0
@@ -84,9 +84,9 @@ pop this 2
 push pointer 0
 call Square.draw 1
 pop temp 0
-goto label1
-label label2
-label label1
+goto IF_TRUE0
+label IF_FALSE0
+label IF_TRUE0
 push constant 0
 return
 function Square.decSize 0
@@ -96,7 +96,7 @@ push this 2
 push constant 2
 gt
 not
-if-goto label4
+if-goto IF_FALSE1
 push pointer 0
 call Square.erase 1
 pop temp 0
@@ -107,9 +107,9 @@ pop this 2
 push pointer 0
 call Square.draw 1
 pop temp 0
-goto label3
-label label4
-label label3
+goto IF_TRUE1
+label IF_FALSE1
+label IF_TRUE1
 push constant 0
 return
 function Square.moveUp 0
@@ -119,7 +119,7 @@ push this 1
 push constant 1
 gt
 not
-if-goto label6
+if-goto IF_FALSE2
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -155,9 +155,9 @@ push constant 1
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto label5
-label label6
-label label5
+goto IF_TRUE2
+label IF_FALSE2
+label IF_TRUE2
 push constant 0
 return
 function Square.moveDown 0
@@ -169,7 +169,7 @@ add
 push constant 254
 lt
 not
-if-goto label8
+if-goto IF_FALSE3
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -205,9 +205,9 @@ push this 2
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto label7
-label label8
-label label7
+goto IF_TRUE3
+label IF_FALSE3
+label IF_TRUE3
 push constant 0
 return
 function Square.moveLeft 0
@@ -217,7 +217,7 @@ push this 0
 push constant 1
 gt
 not
-if-goto label10
+if-goto IF_FALSE4
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -253,9 +253,9 @@ push this 2
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto label9
-label label10
-label label9
+goto IF_TRUE4
+label IF_FALSE4
+label IF_TRUE4
 push constant 0
 return
 function Square.moveRight 0
@@ -267,7 +267,7 @@ add
 push constant 510
 lt
 not
-if-goto label12
+if-goto IF_FALSE5
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -303,8 +303,8 @@ push this 2
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto label11
-label label12
-label label11
+goto IF_TRUE5
+label IF_FALSE5
+label IF_TRUE5
 push constant 0
 return

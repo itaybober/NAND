@@ -231,9 +231,17 @@ class CompilationEngine:
             self.compile_expression()
             self.eat("]")
             self.vm_writer.write_arithmetic("ADD")
+
             self.eat("=")
             self.compile_expression()
             self.eat(";")
+
+            self.vm_writer.write_pop("TEMP", 0)
+            self.vm_writer.write_pop("POINTER", 1)
+            self.vm_writer.write_push("TEMP", 0)
+            self.vm_writer.write_push("THAT", 0)
+
+
         else:
             self.eat("=")
             self.compile_expression()
@@ -303,12 +311,7 @@ class CompilationEngine:
         if self.tokenizer.cur_token in ["-", "~"]:
             op = self.tokenizer.cur_token
             self.tokenizer.advance()
-            if self.tokenizer.cur_token == "(":
-                self.eat("(")
-                self.compile_expression()
-                self.eat(")")
-            else:
-                self.compile_expression()
+            self.compile_expression()
             self.vm_writer.write_arithmetic(PREOPDICT[op])
 
 
@@ -316,7 +319,6 @@ class CompilationEngine:
             self.eat("(")
             self.compile_expression()
             self.eat(")")
-
 
 
         if self.tokenizer.cur_token[0] in INTEGERS:
@@ -330,6 +332,7 @@ class CompilationEngine:
             else:
                 self.vm_writer.write_push("CONST", 0)
             self.tokenizer.advance()
+
         # if it's a function
         if self.tokenizer.cur_token not in INTEGERS and self.tokenizer.cur_token not in SYMBOLS:
             if self.symtable.type_of(self.tokenizer.cur_token) is None:
@@ -344,10 +347,10 @@ class CompilationEngine:
                     self.vm_writer.write_push(KINDDICT[var_kind], var_index)
                     self.compile_expression()
                     self.vm_writer.write_arithmetic("ADD")
-                    self.vm_writer.write_pop("TEMP", 0)
+                    # self.vm_writer.write_pop("TEMP", 0)
                     self.vm_writer.write_pop("POINTER", 1)
-                    self.vm_writer.write_push("TEMP", 0)
-                    self.vm_writer.write_pop("THAT", 0)
+                    # self.vm_writer.write_push("TEMP", 0)
+                    self.vm_writer.write_push("THAT", 0)
                     self.eat("]")
                 else:
                     kind = KINDDICT[self.symtable.kind_of(var_name)]
